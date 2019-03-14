@@ -1,6 +1,7 @@
 from keras.callbacks import EarlyStopping
 from keras.layers import Dense
 from keras.layers import LSTM
+from keras.layers import Dropout
 from keras.models import Sequential
 
 from .unit import get_param_default_value as _dv
@@ -41,6 +42,9 @@ class Model(object):
             elif t == 'lstm':
                 # https://keras.io/zh/layers/recurrent/#lstm
                 self.model.add(LSTM.from_config(layer))
+            elif t == 'dropout':
+                # https://keras.io/zh/layers/recurrent/#Dropout
+                self.model.add(Dropout.from_config(layer))
 
         # https://keras.io/zh/models/model/#compile
         self.model.compile(**compile)
@@ -81,15 +85,19 @@ class Model(object):
                                     _dv(self.model.fit, 'steps_per_epoch'))
         validation_steps = train.pop('validation_steps',
                                      _dv(self.model.fit, 'validation_steps'))
-        return self.model.fit(X, Y, epochs=epochs, callbacks=callbacks,
-                              batch_size=batch_size, verbose=verbose,
-                              validation_data=validation_data,
-                              validation_split=validation_split,
-                              shuffle=shuffle, class_weight=class_weight,
-                              sample_weight=sample_weight,
-                              initial_epoch=initial_epoch,
-                              steps_per_epoch=steps_per_epoch,
-                              validation_steps=validation_steps)
+        self.history = self.model.fit(X, Y, epochs=epochs, callbacks=callbacks,
+                                      batch_size=batch_size, verbose=verbose,
+                                      validation_data=validation_data,
+                                      validation_split=validation_split,
+                                      shuffle=shuffle,
+                                      class_weight=class_weight,
+                                      sample_weight=sample_weight,
+                                      initial_epoch=initial_epoch,
+                                      steps_per_epoch=steps_per_epoch,
+                                      validation_steps=validation_steps)
+
+        self.model.summary()
+        return self.history
 
     def predict(self, X, predict):
         """模型預測
