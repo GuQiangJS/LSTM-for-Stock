@@ -17,8 +17,10 @@ class DataLoaderTestCase(unittest.TestCase):
         for col in ['close', 'open', 'high', 'low', 'volume']:
             self.assertTrue(np.array_equal(d[col].values,
                                            dataloader.data[col].values), col)
-        # self.assertEqual(len(dataloader.data_train), int(len(d) * 0.9))
-        # self.assertEqual(len(dataloader.data_val), int(len(d) * 0.1))
+
+    def test_loaddata_online(self):
+        dataloader=DataLoader('601398', '399300',online=True,start='2019-03-01')
+        print(dataloader.data)
 
     def test_get_train_data(self):
         dataloader = DataLoader('601398', '399300')

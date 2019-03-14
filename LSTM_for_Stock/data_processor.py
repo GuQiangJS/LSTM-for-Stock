@@ -3,6 +3,8 @@ import datetime
 import numpy as np
 from QUANTAXIS import QA_fetch_index_day_adv as Fetch_index_adv
 from QUANTAXIS import QA_fetch_stock_day_adv as Fetch_stock_adv
+from QUANTAXIS.QAFetch.QATdx import QA_fetch_get_index_day as Fetch_index
+from QUANTAXIS.QAFetch.QATdx import QA_fetch_get_stock_day as Fetch_stock
 from sklearn.preprocessing import Normalizer
 
 
@@ -14,9 +16,15 @@ class DataLoader(object):
         benchmark_code (str): 指數代碼
         split (float): 訓練集+驗證集/測試集的拆分比率。（0<x<1）。默認為0.1。
                        Example: 0.1 意味著保留10%的數據作為驗證集
-        columns (list): 獲取數據時保留的列名。**會取第一列為結果集**。
+        columns (list): 獲取數據時保留的列名。
+                        當online為**True**時，為['close', 'open', 'high', 'low', 'vol']。
+                        否則是['close', 'open', 'high', 'low', 'volume']。
+                        **會取第一列為結果集**。
         fillna (str): 填充Nan值所用的method。參考 `pandas.DataFrame.fillna`_。
                       如果不需要填充則傳入None。
+        online (bool): 是否從網絡獲取數據。默認為（False）。
+                       從本地獲取的數據默認進行復權處理（前復權）。
+                       從網絡獲取數據不進行復權處理。
         fq (str): 是否採用復權數據。默認為 前復權。如果不需要復權則傳入 `None`。
         dropna : 是否在填充Nan值之後丟棄剩餘的Nan值。
         start (str): 數據開始日期。數據格式(`%Y-%m-%d`)。默認值 `1990-01-01`。
@@ -29,14 +37,26 @@ class DataLoader(object):
     def __init__(self, stock_code,
                  benchmark_code,
                  split=0.1,
-                 columns=['close', 'open', 'high', 'low', 'volume'],
+                 columns=None,
                  fillna='ffill',
                  dropna=True,
+                 online=False,
                  fq='qfq',
                  start='1990-01-01',
                  end=datetime.datetime.today().strftime('%Y-%m-%d')):
-        self._stock_df = self._fetch_stock_adv(stock_code, start, end, fq=fq)
-        self._benchmark_df = self._fetch_index_adv(benchmark_code, start, end)
+        if columns is None:
+            if online:
+                columns = ['close', 'open', 'high', 'low', 'vol']
+            else:
+                columns = ['close', 'open', 'high', 'low', 'volume']
+        if not online:
+            self._stock_df = self._fetch_stock_adv(stock_code, start, end,
+                                                   fq=fq)
+            self._benchmark_df = self._fetch_index_adv(benchmark_code, start,
+                                                       end)
+        else:
+            self._stock_df = Fetch_stock(stock_code, start, end)
+            self._benchmark_df = Fetch_index(benchmark_code, start, end)
         self.stock_code = stock_code
         self.benchmark_code = benchmark_code
         # 完整數據
