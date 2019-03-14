@@ -49,21 +49,42 @@ class DataLoader(object):
         len_split = int(len(self.data) * (1 - split))
         # # 丟棄了測試用列的數據源
         # d = self.data.drop(columns=[val_column_name])
-        # 訓練集+驗證集可用數據（丟棄了測試用列）
-        self._X_train = self.data.values[:len_split]
-        # # 訓練集+驗證集測試數據
-        # self._Y_train = self.data[val_column_name].values[:len_split]
-        # assert len(self._X_train) == len(self._Y_train)
-        # 保留的測試集可用數據（丟棄了測試用列）
-        self._X_val = self.data.values[len_split:]
-        # # 測試集測試數據
-        # self._Y_val = self.data[val_column_name].values[len_split:]
-        # assert len(self._X_val) == len(self._Y_val)
-        self.len_train = len(self._X_train)  # 訓練集+驗證集大小
-        # self.len_val = len(self._X_val)  # 保留的測試集大小
+        # 訓練集+测试集可用數據
+        self._np_train = self.data.values[:len_split]
+        self.len_train = len(self._np_train)  # 訓練集+测试集大小
+        # 保留的验证集可用數據
+        self._np_valid = self.data.values[len_split:]
+        self.len_valid = len(self._np_valid)  # 保留的验证集大小
+
+    def get_valid_data(self, window_size, test_size, normalize):
+        """按照給定的窗口大小獲取验证集的X,Y。
+        X的大小為窗口大小，Y為窗口期最後一項。
+        Args:
+            test_size: 測試數據大小
+            normalize: 是否執行正則化
+            window_size: 窗口大小
+
+        Returns:
+            np.array,np.array: x:三維數組，第一維尺寸是 總拆分的數量；
+                                           第二維尺寸是 window_size；
+                                           第三維尺寸是 總共的測試特性數據量；
+                               y:二維數組，第一維尺寸與 x 一致。
+                                           第二維尺寸是 test_size。
+        """
+        data_x = []
+        data_y = []
+        for i in range(self.len_valid - window_size - test_size):
+            x, y = self._next_window(self._np_valid,
+                                     i,
+                                     window_size,
+                                     test_size,
+                                     normalize)
+            data_x.append(x)
+            data_y.append(y)
+        return np.array(data_x), np.array(data_y)
 
     def get_train_data(self, window_size, test_size, normalize):
-        """按照給定的窗口大小獲取訓練集的X,Y。
+        """按照給定的窗口大小獲取訓練集+测试集的X,Y。
         X的大小為窗口大小，Y為窗口期最後一項。
         Args:
             test_size: 測試數據大小
@@ -80,18 +101,23 @@ class DataLoader(object):
         data_x = []
         data_y = []
         for i in range(self.len_train - window_size - test_size):
-            x, y = self._next_window(i, window_size, test_size, normalize)
+            x, y = self._next_window(self._np_train,
+                                     i,
+                                     window_size,
+                                     test_size,
+                                     normalize)
             data_x.append(x)
             data_y.append(y)
         return np.array(data_x), np.array(data_y)
 
-    def _next_window(self, i, window_size, test_size, normalize):
+    def _next_window(self, arr, start, window_size, test_size, normalize):
         """按照指定起始位置和長度構建X,Y
         Args:
-            test_size: 結果列長度
-            normalize: 是否執行規則化
-            i: 起始位置
-            window_size: 窗口長度
+            arr (np.array): 待拆分的数据集
+            test_size (int): 結果列長度
+            normalize (bool): 是否執行規則化
+            start (int): 起始位置
+            window_size (int): 窗口長度
         Return:
             np.array,np.array: x:二維數組，第一維是 window_size 大小；
                                            第二維是 總共的測試特性數據量；
@@ -100,14 +126,14 @@ class DataLoader(object):
         """
 
         '''
-        y取值時會去 self.data 中取值，因為如果 i+window_size+test_size
-        的值超過了 _X_train 的取值範圍時會報錯。
-        但是當 i+window_size+test_size 的值過大，超過了 data 的尺寸時，
+        y取值時會去 self.data 中取值，因為如果 start+window_size+test_size
+        的值超過了 _np_train 的取值範圍時會報錯。
+        但是當 start+window_size+test_size 的值過大，超過了 data 的尺寸時，
         依然會報錯。這裡就涉及到了構造函數傳入的 split 值，如果過小或者
         數據集本身就很小而window_size或者test_size過大就可能造成此問題。
        '''
         # 首先從i開始取出window_size+test_size長度的數據
-        window = np.copy(self._X_train[i:i + window_size + test_size])
+        window = np.copy(arr[start:start + window_size + test_size])
         if normalize:
             # 分別對每一列做標準化
             for j in range(window.shape[1]):

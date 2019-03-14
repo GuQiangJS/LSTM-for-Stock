@@ -33,7 +33,7 @@ class DataLoaderTestCase(unittest.TestCase):
                     self.assertEqual(Y[i][j], d.iloc[j + i + z[0]]['close'],
                                      'z={0},i={1}'.format(z, i))
 
-    def test_plot_train_data2(self):
+    def plot_train_data2(self):
         """測試繪圖，做規則化的訓練價格和測試價格"""
         start = random.randint(0,500)
         window = 60
@@ -48,7 +48,7 @@ class DataLoaderTestCase(unittest.TestCase):
                      y=y[start])
         plt.show()
 
-    def test_plot_train_data1(self):
+    def plot_train_data1(self):
         """測試繪圖，不做規則化的訓練價格和測試價格"""
         start = random.randint(0,500)
         window = 30
