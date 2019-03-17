@@ -50,7 +50,7 @@ class Model(object):
         self.model.compile(**compile)
 
     def train(self, X, Y, train, callbacks=[
-        EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")]):
+            EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")]):
         """訓練模型
 
         Args:
@@ -109,7 +109,7 @@ class Model(object):
         Returns:
             參考 `predict`_ 函數定義。
 
-        .. _fit:
+        .. _predict:
         https://keras.io/zh/models/model/#predict
         """
         steps = predict.pop('steps', _dv(self.model.predict, 'steps'))
@@ -118,3 +118,26 @@ class Model(object):
         verbose = predict.pop('verbose', _dv(self.model.predict, 'verbose'))
         return self.model.predict(X, batch_size=batch_size, verbose=verbose,
                                   steps=steps)
+
+    def evaluate(self, X, Y, evaluate):
+        """計算模型誤差
+
+        Args:
+            X: 輸入數據
+            Y: 標籤
+            evaluate {dict}: 預測模型配置。定義可用屬性參見 `evaluate`_ 函數定義。
+            callbacks:
+        Returns:
+            參考 `evaluate`_ 函數定義。
+
+        .. _evaluate:
+        https://keras.io/zh/models/model/#evaluate
+        """
+        steps = evaluate.pop('steps', _dv(self.model.evaluate, 'steps'))
+        sample_weight = evaluate.pop('sample_weight', _dv(
+            self.model.evaluate, 'sample_weight'))
+        batch_size = evaluate.pop('batch_size',
+                                  _dv(self.model.evaluate, 'batch_size'))
+        verbose = evaluate.pop('verbose', _dv(self.model.evaluate, 'verbose'))
+        return self.model.evaluate(X, batch_size=batch_size, verbose=verbose,
+                                   steps=steps, sample_weight=sample_weight)
