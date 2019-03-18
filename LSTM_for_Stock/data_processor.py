@@ -6,6 +6,7 @@ from QUANTAXIS import QA_fetch_stock_day_adv as Fetch_stock_adv
 from QUANTAXIS.QAFetch.QATdx import QA_fetch_get_index_day as Fetch_index
 from QUANTAXIS.QAFetch.QATdx import QA_fetch_get_stock_day as Fetch_stock
 from sklearn.preprocessing import Normalizer
+from sklearn.model_selection import train_test_split
 
 
 class DataLoader(object):
@@ -120,7 +121,8 @@ class DataLoader(object):
         """
         data_x = []
         data_y = []
-        for i in range(self.len_train - window_size - test_size):
+        #range方法取值会少1，所以最后需要+1
+        for i in range(self.len_train - window_size - test_size+1):
             x, y = self._next_window(self._np_train,
                                      i,
                                      window_size,

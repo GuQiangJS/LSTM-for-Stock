@@ -3,7 +3,7 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers import Dropout
 from keras.models import Sequential
-
+import matplotlib.pyplot as plt
 from .unit import get_param_default_value as _dv
 
 
@@ -15,7 +15,7 @@ class Model(object):
     def __init__(self):
         self.model = Sequential()
 
-    def build_model(self, layers, compile):
+    def build_model(self, layers, compile={}):
         """根據配置項構建 `self.model`。
 
         Args:
@@ -49,8 +49,9 @@ class Model(object):
         # https://keras.io/zh/models/model/#compile
         self.model.compile(**compile)
 
-    def train(self, X, Y, train, callbacks=[
-            EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")]):
+    def train(self, X, Y, train={},
+              callbacks=[EarlyStopping(monitor="loss",
+                                       patience=10, verbose=1, mode="auto")]):
         """訓練模型
 
         Args:
@@ -99,10 +100,11 @@ class Model(object):
         self.model.summary()
         return self.history
 
-    def predict(self, X, predict):
+    def predict(self, X, predict={}):
         """模型預測
 
         Args:
+            predict:
             X: 待預測的數據集
             predict {dict}: 預測模型配置。定義可用屬性參見 `predict`_ 函數定義。
             callbacks:
@@ -119,7 +121,7 @@ class Model(object):
         return self.model.predict(X, batch_size=batch_size, verbose=verbose,
                                   steps=steps)
 
-    def evaluate(self, X, Y, evaluate):
+    def evaluate(self, X, Y, evaluate={}):
         """計算模型誤差
 
         Args:
