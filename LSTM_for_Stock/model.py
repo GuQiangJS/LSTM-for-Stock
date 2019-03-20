@@ -1,9 +1,9 @@
 from keras.callbacks import EarlyStopping
 from keras.layers import Dense
-from keras.layers import LSTM
 from keras.layers import Dropout
+from keras.layers import LSTM
 from keras.models import Sequential
-import matplotlib.pyplot as plt
+
 from .unit import get_param_default_value as _dv
 
 
@@ -141,5 +141,5 @@ class Model(object):
         batch_size = evaluate.pop('batch_size',
                                   _dv(self.model.evaluate, 'batch_size'))
         verbose = evaluate.pop('verbose', _dv(self.model.evaluate, 'verbose'))
-        return self.model.evaluate(X, batch_size=batch_size, verbose=verbose,
+        return self.model.evaluate(X, Y, batch_size=batch_size, verbose=verbose,
                                    steps=steps, sample_weight=sample_weight)

@@ -1,12 +1,45 @@
 import datetime
+from abc import abstractmethod
 
 import numpy as np
+import pandas as pd
 from QUANTAXIS import QA_fetch_index_day_adv as Fetch_index_adv
 from QUANTAXIS import QA_fetch_stock_day_adv as Fetch_stock_adv
 from QUANTAXIS.QAFetch.QATdx import QA_fetch_get_index_day as Fetch_index
 from QUANTAXIS.QAFetch.QATdx import QA_fetch_get_stock_day as Fetch_stock
 from sklearn.preprocessing import Normalizer
-from sklearn.model_selection import train_test_split
+
+
+class FeaturesAppender(object):
+    """數據特征附加器
+
+    """
+
+    @abstractmethod
+    def _appendFeautres(self, df) -> (pd.DataFrame, [str]):
+        pass
+
+    @property
+    def feature_columns(self) -> dict:
+        """附加的特征列的名稱和序號的字典。
+        這些列不會參與 `DataLoader` 的標準化處理。"""
+        return self._getNameIndexDict(self._full_names,
+                                      list(set(self._new_names).difference(
+                                          set(self._ori_names))))
+
+    def appendFeatures(self, df):
+        self._ori_names = list(df.columns)
+        self._new_names = []
+        df, self._new_names = self._appendFeautres(df)
+        self._full_names = list(df.columns)
+        return df
+
+    def _getNameIndexDict(self, columns, names):
+        d = {}
+        if columns and names:
+            for name in names:
+                d[name] = columns.index(name)
+        return d
 
 
 class DataLoader(object):
@@ -30,6 +63,8 @@ class DataLoader(object):
         dropna : 是否在填充Nan值之後丟棄剩餘的Nan值。
         start (str): 數據開始日期。數據格式(`%Y-%m-%d`)。默認值 `1990-01-01`。
         end (str): 數據結束日期。數據格式(`%Y-%m-%d`)。默認值 `當天`。
+        features_appender (FeaturesAppender) : 附加特征值使用的方法。
+                        接收的返回值為附加的特征列的名稱和序號的字典。
 
     .. _pandas.DataFrame.fillna:
         https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.fillna.html
@@ -44,7 +79,8 @@ class DataLoader(object):
                  online=False,
                  fq='qfq',
                  start='1990-01-01',
-                 end=datetime.datetime.today().strftime('%Y-%m-%d')):
+                 end=datetime.datetime.today().strftime('%Y-%m-%d'),
+                 features_appender=None):
         if columns is None:
             if online:
                 columns = ['close', 'open', 'high', 'low', 'vol']
@@ -63,18 +99,25 @@ class DataLoader(object):
         # 完整數據
         self.data = self._stock_df[columns].join(self._benchmark_df[columns],
                                                  rsuffix='_benchmark')
+        self.features_appender = features_appender  #
+        if features_appender:
+            self.data = self.features_appender.appendFeatures(self.data)
         if fillna:
             self.data.fillna(method=fillna, inplace=True)
         if dropna:
             self.data.dropna(inplace=True, subset=[self.data.columns[0]])
-        len_split = int(len(self.data) * (1 - split))
+        self.data = self.data[self.data.index >= self._benchmark_df.index[0]]
+        # 训訓練集+測試集的分割下標
+        self._len_split = int(len(self.data) * (1 - split))
         # # 丟棄了測試用列的數據源
         # d = self.data.drop(columns=[val_column_name])
         # 訓練集+测试集可用數據
-        self._np_train = self.data.values[:len_split]
+        self._np_train = self.data.values[:self._len_split]
+        self._df_train = self.data[:self._len_split]  # 訓練集+測試集的`DataFrame`格式
         self.len_train = len(self._np_train)  # 訓練集+测试集大小
         # 保留的验证集可用數據
-        self._np_valid = self.data.values[len_split:]
+        self._np_valid = self.data.values[self._len_split:]
+        self._df_valid = self.data[self._len_split:]  # 保留的验证集的`DataFrame`格式
         self.len_valid = len(self._np_valid)  # 保留的验证集大小
 
     def get_valid_data(self, window_size, test_size, normalize):
@@ -121,8 +164,8 @@ class DataLoader(object):
         """
         data_x = []
         data_y = []
-        #range方法取值会少1，所以最后需要+1
-        for i in range(self.len_train - window_size - test_size+1):
+        # range方法取值会少1，所以最后需要+1
+        for i in range(self.len_train - window_size - test_size + 1):
             x, y = self._next_window(self._np_train,
                                      i,
                                      window_size,
@@ -132,7 +175,7 @@ class DataLoader(object):
             data_y.append(y)
         return np.array(data_x), np.array(data_y)
 
-    def _next_window(self, arr, start, window_size, test_size, normalize):
+    def  _next_window(self, arr, start, window_size, test_size, normalize):
         """按照指定起始位置和長度構建X,Y
         Args:
             arr (np.array): 待拆分的数据集
@@ -159,7 +202,8 @@ class DataLoader(object):
         if normalize:
             # 分別對每一列做標準化
             for j in range(window.shape[1]):
-                window[:, j] = Normalizer().fit_transform([window[:, j]])[0]
+                if self.features_appender and j not in self.features_appender.feature_columns.values():
+                    window[:, j] = Normalizer().fit_transform([window[:, j]])[0]
         # 取數據的前一部分為x
         x = window[:-test_size]
         # 取數據的最後 test_size 部分的第一列為y。
