@@ -15,9 +15,15 @@ class FeaturesAppender(object):
 
     """
 
+    def __init__(self, kwargs:dict={}):
+        self._full_names = []
+        self._ori_names = []
+        self._new_names = []
+        self.kwargs = kwargs
+
     @abstractmethod
-    def _appendFeautres(self, df) -> (pd.DataFrame, [str]):
-        pass
+    def appendFeautres(self, df) -> (pd.DataFrame, [str]):
+        return df, []
 
     @property
     def feature_columns(self) -> dict:
@@ -27,10 +33,10 @@ class FeaturesAppender(object):
                                       list(set(self._new_names).difference(
                                           set(self._ori_names))))
 
-    def appendFeatures(self, df):
+    def append(self, df):
         self._ori_names = list(df.columns)
         self._new_names = []
-        df, self._new_names = self._appendFeautres(df)
+        df, self._new_names = self.appendFeautres(df)
         self._full_names = list(df.columns)
         return df
 
@@ -54,13 +60,10 @@ class DataLoader(object):
                         當online為**True**時，為['close', 'open', 'high', 'low', 'vol']。
                         否則是['close', 'open', 'high', 'low', 'volume']。
                         **會取第一列為結果集**。
-        fillna (str): 填充Nan值所用的method。參考 `pandas.DataFrame.fillna`_。
-                      如果不需要填充則傳入None。
         online (bool): 是否從網絡獲取數據。默認為（False）。
                        從本地獲取的數據默認進行復權處理（前復權）。
                        從網絡獲取數據不進行復權處理。
         fq (str): 是否採用復權數據。默認為 前復權。如果不需要復權則傳入 `None`。
-        dropna : 是否在填充Nan值之後丟棄剩餘的Nan值。
         start (str): 數據開始日期。數據格式(`%Y-%m-%d`)。默認值 `1990-01-01`。
         end (str): 數據結束日期。數據格式(`%Y-%m-%d`)。默認值 `當天`。
         features_appender (FeaturesAppender) : 附加特征值使用的方法。
@@ -74,38 +77,30 @@ class DataLoader(object):
                  benchmark_code,
                  split=0.1,
                  columns=None,
-                 fillna='ffill',
-                 dropna=True,
                  online=False,
                  fq='qfq',
                  start='1990-01-01',
                  end=datetime.datetime.today().strftime('%Y-%m-%d'),
-                 features_appender=None):
-        if columns is None:
-            if online:
-                columns = ['close', 'open', 'high', 'low', 'vol']
-            else:
-                columns = ['close', 'open', 'high', 'low', 'volume']
+                 features_appender=FeaturesAppender()):
+        columns = ['close', 'open', 'high', 'low', 'volume']
         if not online:
             self._stock_df = self._fetch_stock_adv(stock_code, start, end,
                                                    fq=fq)
             self._benchmark_df = self._fetch_index_adv(benchmark_code, start,
                                                        end)
         else:
-            self._stock_df = Fetch_stock(stock_code, start, end)
-            self._benchmark_df = Fetch_index(benchmark_code, start, end)
+            self._stock_df = self._fetch_stock_online(stock_code, start, end)
+            self._benchmark_df = self._fetch_index_online(benchmark_code, start,
+                                                          end)
+
         self.stock_code = stock_code
         self.benchmark_code = benchmark_code
         # 完整數據
         self.data = self._stock_df[columns].join(self._benchmark_df[columns],
                                                  rsuffix='_benchmark')
-        self.features_appender = features_appender  #
-        if features_appender:
-            self.data = self.features_appender.appendFeatures(self.data)
-        if fillna:
-            self.data.fillna(method=fillna, inplace=True)
-        if dropna:
-            self.data.dropna(inplace=True, subset=[self.data.columns[0]])
+        self.features_appender = FeaturesAppender() if features_appender is None else features_appender  #
+        if self.features_appender:
+            self.data = self.features_appender.append(self.data)
         self.data = self.data[self.data.index >= self._benchmark_df.index[0]]
         # 训訓練集+測試集的分割下標
         self._len_split = int(len(self.data) * (1 - split))
@@ -119,6 +114,11 @@ class DataLoader(object):
         self._np_valid = self.data.values[self._len_split:]
         self._df_valid = self.data[self._len_split:]  # 保留的验证集的`DataFrame`格式
         self.len_valid = len(self._np_valid)  # 保留的验证集大小
+
+    @staticmethod
+    def _index_to_datetime(df):
+        df.index = df.index.astype('datetime64[ns]')
+        return df
 
     def get_valid_data(self, window_size, test_size, normalize):
         """按照給定的窗口大小獲取验证集的X,Y。
@@ -175,7 +175,7 @@ class DataLoader(object):
             data_y.append(y)
         return np.array(data_x), np.array(data_y)
 
-    def  _next_window(self, arr, start, window_size, test_size, normalize):
+    def _next_window(self, arr, start, window_size, test_size, normalize):
         """按照指定起始位置和長度構建X,Y
         Args:
             arr (np.array): 待拆分的数据集
@@ -220,6 +220,14 @@ class DataLoader(object):
     def end(self):
         """獲取當前數據的結束日期。如果沒有數據則返回None。"""
         return self.data.index[-1] if not self.data.empty else None
+
+    def _fetch_stock_online(self, code, start, end):
+        df = Fetch_stock(code, start, end).rename(columns={'vol': 'volume'})
+        return DataLoader._index_to_datetime(df)
+
+    def _fetch_index_online(self, code, start, end):
+        df = Fetch_index(code, start, end).rename(columns={'vol': 'volume'})
+        return DataLoader._index_to_datetime(df)
 
     def _fetch_stock_adv(self, code, start, end, fq, drop_code=True):
         """讀取股票日線。

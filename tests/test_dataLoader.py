@@ -10,6 +10,10 @@ from LSTM_for_Stock.data_processor import DataLoader
 from LSTM_for_Stock.data_processor import FeaturesAppender
 
 
+import QUANTAXIS as QA
+import talib
+import pandas as pd
+
 class DataLoaderTestCase(unittest.TestCase):
     def test_init(self):
         dataloader = DataLoader('601398', '399300')
@@ -104,19 +108,46 @@ class DataLoaderTestCase(unittest.TestCase):
         DataLoader('000538', '399300').get_train_data(10, 5, True)
 
     def test_append_features(self):
-        fea_app=test_feature_appender()
-        d=DataLoader('000538', '399300', features_appender=fea_app)
+        fea_app=features_appender_10_2_2({'NNN':'ABC'})
+        d=DataLoader('000538', '399300', features_appender=fea_app,online=True)
         X,Y=d.get_train_data(1,1,True)
         for col_name,col_index in fea_app.feature_columns().items():
             self.assertTrue(col_name in list(d.data.columns))
 
+    def talib_TRANGE(DataFrame):
+        res = talib.TRANGE(DataFrame.high.values,DataFrame.low.values,DataFrame.close.values)
+        return pd.DataFrame({'TRANGE': res}, index=DataFrame.index)
+    def talib_OBV(DataFrame):
+        res = talib.OBV(DataFrame.close.values, DataFrame.volume.values)
+        return pd.DataFrame({'OBV': res}, index=DataFrame.index)
+    def talib_AVGPRICE(DataFrame):
+        res = talib.AVGPRICE(DataFrame.open.values,DataFrame.high.values,DataFrame.low.values,DataFrame.close.values)
+        return pd.DataFrame({'AVGPRICE': res}, index=DataFrame.index)
+    def talib_MEDPRICE(DataFrame):
+        res = talib.MEDPRICE(DataFrame.high.values,DataFrame.low.values)
+        return pd.DataFrame({'MEDPRICE': res}, index=DataFrame.index)
+    def talib_TYPPRICE(DataFrame):
+        res = talib.TYPPRICE(DataFrame.high.values,DataFrame.low.values,DataFrame.close.values)
+        return pd.DataFrame({'TYPPRICE': res}, index=DataFrame.index)
+    def talib_WCLPRICE(DataFrame):
+        res = talib.WCLPRICE(DataFrame.high.values,DataFrame.low.values,DataFrame.close.values)
+        return pd.DataFrame({'WCLPRICE': res}, index=DataFrame.index)
 
-class test_feature_appender(FeaturesAppender):
-    def _appendFeautres(self, df):
+class features_appender_10_2_2(FeaturesAppender):
+    def appendFeautres(self, df) -> (pd.DataFrame, [str]):
+        df=df.fillna(method='ffill').dropna()
         df["dayofweek"] = df.index.dayofweek
         df["dayofyear"] = df.index.dayofyear
         df["daysinmonth"] = df.index.daysinmonth
-        return df,["dayofweek","dayofyear","daysinmonth"]
+        df['OBV']=DataLoaderTestCase.talib_OBV(df)
+        df['TRANGE']=DataLoaderTestCase.talib_TRANGE(df)
+        df['AVGPRICE']=DataLoaderTestCase.talib_AVGPRICE(df)
+        df['MEDPRICE']=DataLoaderTestCase.talib_MEDPRICE(df)
+        df['TYPPRICE']=DataLoaderTestCase.talib_TYPPRICE(df)
+        df['WCLPRICE']=DataLoaderTestCase.talib_WCLPRICE(df)
+        df['ATR']=QA.talib_indicators.ATR(df,N=10)
+        df=df.dropna()
+        return df,["dayofweek","dayofyear","daysinmonth",'ATR','TRANGE']#無需再做Norm的列
 
 
 if __name__ == '__main__':

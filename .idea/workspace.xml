@@ -4,11 +4,9 @@
     <list default="true" id="335fcf50-b8e1-4d84-8266-c06671bd4314" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LSTM_for_Stock/data_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/LSTM_for_Stock/data_processor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LSTM_for_Stock/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/LSTM_for_Stock/model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LSTM_for_Stock/unit.py" beforeDir="false" afterPath="$PROJECT_DIR$/LSTM_for_Stock/unit.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/samples/sample.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/samples/sample.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/test_dataLoader.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_dataLoader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_plot.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_plot.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,59 +26,51 @@
     <SUITE FILE_PATH="coverage/LSTM_for_Stock$Unittests_for_test_dataLoader_DataLoaderTestCase_test_append_features.coverage" NAME="Unittests for test_dataLoader.DataLoaderTestCase.test_append_features Coverage Results" MODIFIED="1552963027708" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/LSTM_for_Stock$Unittests_for_test_model_MyTestCase_test_evaluate.coverage" NAME="Unittests for test_model.MyTestCase.test_evaluate Coverage Results" MODIFIED="1552900174739" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
   </component>
-  <component name="FUSProjectUsageTrigger">
-    <session id="-1334587769">
-      <usages-collector id="statistics.lifecycle.project">
-        <counts>
-          <entry key="project.closed" value="1" />
-          <entry key="project.open.time.11" value="1" />
-          <entry key="project.open.time.12" value="1" />
-          <entry key="project.opened" value="2" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.edit">
-        <counts>
-          <entry key="py" value="2574" />
-          <entry key="txt" value="4" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.edit">
-        <counts>
-          <entry key="PLAIN_TEXT" value="4" />
-          <entry key="Python" value="2574" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.open">
-        <counts>
-          <entry key="py" value="12" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.open">
-        <counts>
-          <entry key="Python" value="12" />
-        </counts>
-      </usages-collector>
-    </session>
-  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LSTM_for_Stock/data_processor.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="86">
-              <caret line="7" column="28" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="28" />
+            <state relative-caret-position="764">
+              <caret line="205" column="45" selection-start-line="205" selection-start-column="35" selection-end-line="205" selection-end-column="45" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/pandas/core/indexing.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="174">
+              <caret line="1326" selection-start-line="1326" selection-end-line="1326" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/LSTM_for_Stock/model.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-309">
+              <caret line="17" column="46" selection-start-line="17" selection-start-column="46" selection-end-line="17" selection-end-column="46" />
+              <folding>
+                <element signature="e#0#41#0" expanded="true" />
+                <element signature="e#377#1495#0" />
+                <element signature="e#4005#4679#0" />
+                <element signature="e#4732#5558#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/LSTM_for_Stock/unit.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="99">
-              <caret line="67" column="42" selection-start-line="67" selection-start-column="42" selection-end-line="67" selection-end-column="42" />
+            <state relative-caret-position="157">
+              <caret line="54" column="65" selection-start-line="54" selection-start-column="48" selection-end-line="54" selection-end-column="65" />
               <folding>
                 <element signature="e#0#29#0" expanded="true" />
-                <marker date="1553045621422" expanded="true" signature="815:1027" ph="..." />
               </folding>
             </state>
           </provider>
@@ -89,23 +79,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/test_plot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="133">
-              <caret line="7" column="26" lean-forward="true" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
+            <state relative-caret-position="456">
+              <caret line="36" column="34" lean-forward="true" selection-start-line="36" selection-start-column="34" selection-end-line="36" selection-end-column="34" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
-                <marker date="1553045208566" expanded="true" signature="204:209" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/LSTM_for_Stock/model.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="484">
-              <caret line="141" column="70" selection-start-line="141" selection-start-column="60" selection-end-line="141" selection-end-column="70" />
-              <folding>
-                <element signature="e#0#41#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -114,21 +91,41 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/test_dataLoader.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1900">
-              <caret line="109" selection-start-line="109" selection-end-line="109" />
+            <state relative-caret-position="234">
+              <caret line="105" selection-start-line="105" selection-end-line="105" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
-                <marker date="1552960880638" expanded="true" signature="4925:5160" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/pandas/core/base.py">
+        <entry file="file://$PROJECT_DIR$/tests/test_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="16967">
-              <caret line="919" selection-start-line="919" selection-end-line="919" />
+            <state relative-caret-position="431">
+              <caret line="32" column="42" selection-start-line="19" selection-start-column="28" selection-end-line="34" selection-end-column="73" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/pandas/core/generic.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="82042">
+              <caret line="4375" selection-start-line="4375" selection-end-line="4375" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/QUANTAXIS/QAIndicator/indicators.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="8094">
+              <caret line="431" selection-start-line="431" selection-end-line="431" />
             </state>
           </provider>
         </entry>
@@ -164,6 +161,8 @@
       <find>kwargs</find>
       <find>input</find>
       <find>features_columns</find>
+      <find>features_appender</find>
+      <find>appendFeautres</find>
     </findStrings>
     <replaceStrings>
       <replace>get_con</replace>
@@ -194,11 +193,10 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
-    <option name="x" value="-8" />
-    <option name="y" value="-8" />
-    <option name="width" value="1456" />
-    <option name="height" value="876" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-7" />
+    <option name="width" value="1370" />
+    <option name="height" value="1047" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -217,6 +215,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -238,7 +237,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -260,7 +258,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python tests.Unittests for test_plot.MyTestCase.test_plot_train_data_full">
+  <component name="RunManager" selected="Python tests.Unittests for test_plot.MyTestCase.test_plot_result_by_pct_change">
     <configuration name="Unittests for test_dataLoader.DataLoaderTestCase.test_append_features" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
       <module name="LSTM-for-Stock" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -276,7 +274,7 @@
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Unittests for test_dataLoader.DataLoaderTestCase.test_get_train_data_1" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+    <configuration name="Unittests for test_dataLoader.DataLoaderTestCase.test_get_train_full" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
       <module name="LSTM-for-Stock" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -285,13 +283,12 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;test_dataLoader.DataLoaderTestCase.test_get_train_data_1&quot;" />
+      <option name="_new_target" value="&quot;test_dataLoader.DataLoaderTestCase.test_get_train_full&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Unittests for test_model.MyTestCase.test_evaluate" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+    <configuration name="Unittests for test_plot.MyTestCase.test_plot_result_1" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
       <module name="LSTM-for-Stock" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -300,13 +297,12 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;test_model.MyTestCase.test_evaluate&quot;" />
+      <option name="_new_target" value="&quot;test_plot.MyTestCase.test_plot_result_1&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Unittests for test_plot.MyTestCase.test_plot_train_data_full" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+    <configuration name="Unittests for test_plot.MyTestCase.test_plot_result_by_pct_change" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
       <module name="LSTM-for-Stock" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -315,24 +311,39 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;test_plot.MyTestCase.test_plot_train_data_full&quot;" />
+      <option name="_new_target" value="&quot;test_plot.MyTestCase.test_plot_result_by_pct_change&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Unittests for test_plot.MyTestCase.test_plot_result_by_scope_1" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+      <module name="LSTM-for-Stock" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_plot.MyTestCase.test_plot_result_by_scope_1&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python tests.Unittests for test_plot.MyTestCase.test_plot_train_data_full" />
-      <item itemvalue="Python tests.Unittests for test_dataLoader.DataLoaderTestCase.test_get_train_data_1" />
-      <item itemvalue="Python tests.Unittests for test_model.MyTestCase.test_evaluate" />
       <item itemvalue="Python tests.Unittests for test_dataLoader.DataLoaderTestCase.test_append_features" />
+      <item itemvalue="Python tests.Unittests for test_dataLoader.DataLoaderTestCase.test_get_train_full" />
+      <item itemvalue="Python tests.Unittests for test_plot.MyTestCase.test_plot_result_1" />
+      <item itemvalue="Python tests.Unittests for test_plot.MyTestCase.test_plot_result_by_scope_1" />
+      <item itemvalue="Python tests.Unittests for test_plot.MyTestCase.test_plot_result_by_pct_change" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python tests.Unittests for test_plot.MyTestCase.test_plot_train_data_full" />
+        <item itemvalue="Python tests.Unittests for test_plot.MyTestCase.test_plot_result_by_pct_change" />
+        <item itemvalue="Python tests.Unittests for test_plot.MyTestCase.test_plot_result_by_scope_1" />
+        <item itemvalue="Python tests.Unittests for test_plot.MyTestCase.test_plot_result_1" />
         <item itemvalue="Python tests.Unittests for test_dataLoader.DataLoaderTestCase.test_append_features" />
-        <item itemvalue="Python tests.Unittests for test_model.MyTestCase.test_evaluate" />
-        <item itemvalue="Python tests.Unittests for test_dataLoader.DataLoaderTestCase.test_get_train_data_1" />
+        <item itemvalue="Python tests.Unittests for test_dataLoader.DataLoaderTestCase.test_get_train_full" />
       </list>
     </recent_temporary>
   </component>
@@ -350,35 +361,35 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Unittests_for_test_dataLoader_DataLoaderTestCase_test_append_features - 2019.03.19 at 09h 55m 28s.xml">
-      <configuration name="Unittests for test_dataLoader.DataLoaderTestCase.test_append_features" configurationId="tests" />
+    <history-entry file="Unittests_for_test_plot_MyTestCase_test_plot_result_by_scope_1 - 2019.03.24 at 21h 52m 46s.xml">
+      <configuration name="Unittests for test_plot.MyTestCase.test_plot_result_by_scope_1" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_for_test_dataLoader_DataLoaderTestCase_test_append_features - 2019.03.19 at 10h 02m 32s.xml">
-      <configuration name="Unittests for test_dataLoader.DataLoaderTestCase.test_append_features" configurationId="tests" />
+    <history-entry file="Unittests_for_test_plot_MyTestCase_test_plot_result_by_scope_1 - 2019.03.24 at 21h 53m 20s.xml">
+      <configuration name="Unittests for test_plot.MyTestCase.test_plot_result_by_scope_1" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_for_test_dataLoader_DataLoaderTestCase_test_append_features - 2019.03.19 at 10h 04m 01s.xml">
-      <configuration name="Unittests for test_dataLoader.DataLoaderTestCase.test_append_features" configurationId="tests" />
+    <history-entry file="Unittests_for_test_plot_MyTestCase_test_plot_result_by_scope_1 - 2019.03.24 at 21h 53m 39s.xml">
+      <configuration name="Unittests for test_plot.MyTestCase.test_plot_result_by_scope_1" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_for_test_dataLoader_DataLoaderTestCase_test_append_features - 2019.03.19 at 10h 05m 04s.xml">
-      <configuration name="Unittests for test_dataLoader.DataLoaderTestCase.test_append_features" configurationId="tests" />
+    <history-entry file="Unittests_for_test_plot_MyTestCase_test_plot_result_by_scope_1 - 2019.03.24 at 21h 54m 56s.xml">
+      <configuration name="Unittests for test_plot.MyTestCase.test_plot_result_by_scope_1" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_for_test_dataLoader_DataLoaderTestCase_test_append_features - 2019.03.19 at 10h 07m 01s.xml">
-      <configuration name="Unittests for test_dataLoader.DataLoaderTestCase.test_append_features" configurationId="tests" />
+    <history-entry file="Unittests_for_test_plot_MyTestCase_test_plot_result_by_scope_1 - 2019.03.24 at 21h 56m 49s.xml">
+      <configuration name="Unittests for test_plot.MyTestCase.test_plot_result_by_scope_1" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_for_test_dataLoader_DataLoaderTestCase_test_append_features - 2019.03.19 at 10h 36m 54s.xml">
-      <configuration name="Unittests for test_dataLoader.DataLoaderTestCase.test_append_features" configurationId="tests" />
+    <history-entry file="Unittests_for_test_plot_MyTestCase_test_plot_result_by_scope_1 - 2019.03.24 at 21h 59m 39s.xml">
+      <configuration name="Unittests for test_plot.MyTestCase.test_plot_result_by_scope_1" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_for_test_dataLoader_DataLoaderTestCase_test_append_features - 2019.03.19 at 10h 38m 08s.xml">
-      <configuration name="Unittests for test_dataLoader.DataLoaderTestCase.test_append_features" configurationId="tests" />
+    <history-entry file="Unittests_for_test_plot_MyTestCase_test_plot_result_by_scope_1 - 2019.03.24 at 22h 00m 19s.xml">
+      <configuration name="Unittests for test_plot.MyTestCase.test_plot_result_by_scope_1" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_for_test_plot_MyTestCase_test_plot_train_data_full - 2019.03.20 at 09h 27m 50s.xml">
-      <configuration name="Unittests for test_plot.MyTestCase.test_plot_train_data_full" configurationId="tests" />
+    <history-entry file="Unittests_for_test_plot_MyTestCase_test_plot_result_by_pct_change - 2019.03.24 at 22h 00m 38s.xml">
+      <configuration name="Unittests for test_plot.MyTestCase.test_plot_result_by_pct_change" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_for_test_plot_MyTestCase_test_plot_train_data_full - 2019.03.20 at 09h 30m 29s.xml">
-      <configuration name="Unittests for test_plot.MyTestCase.test_plot_train_data_full" configurationId="tests" />
+    <history-entry file="Unittests_for_test_plot_MyTestCase_test_plot_result_by_pct_change - 2019.03.24 at 22h 01m 44s.xml">
+      <configuration name="Unittests for test_plot.MyTestCase.test_plot_result_by_pct_change" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_for_test_plot_MyTestCase_test_plot_train_data_full - 2019.03.20 at 09h 34m 11s.xml">
-      <configuration name="Unittests for test_plot.MyTestCase.test_plot_train_data_full" configurationId="tests" />
+    <history-entry file="Unittests_for_test_plot_MyTestCase_test_plot_result_by_pct_change - 2019.03.24 at 22h 02m 27s.xml">
+      <configuration name="Unittests for test_plot.MyTestCase.test_plot_result_by_pct_change" configurationId="tests" />
     </history-entry>
   </component>
   <component name="TodoView">
@@ -391,15 +402,16 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1456" height="876" extended-state="7" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.46098003" visible="true" weight="0.28438395" />
-      <window_info active="true" id="Structure" order="1" sideWeight="0.53901994" side_tool="true" visible="true" weight="0.28438395" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.60954446" visible="true" weight="0.20600632" />
+      <window_info active="true" id="Structure" order="1" sideWeight="0.39045554" side_tool="true" visible="true" weight="0.20600632" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32824427" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.2574124" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.30053908" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3275488" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.37960956" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.40130153" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.329718" />
@@ -420,9 +432,6 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
-  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -431,9 +440,40 @@
           <line>21</line>
           <option name="timeStamp" value="26" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/test_plot.py</url>
+          <line>19</line>
+          <option name="timeStamp" value="74" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/test_dataLoader.py</url>
+          <line>112</line>
+          <option name="timeStamp" value="86" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/test_dataLoader.py</url>
+          <line>148</line>
+          <option name="timeStamp" value="88" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/test_dataLoader.py</url>
+          <line>111</line>
+          <option name="timeStamp" value="90" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/LSTM_for_Stock/unit.py</url>
+          <line>130</line>
+          <option name="timeStamp" value="97" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
+      <configuration name="tests">
+        <watch expression="d.iloc[-days:]['close']" />
+        <watch expression="X.shape" language="Python" />
+        <watch expression="d.iloc[y_start]['close']" />
+        <watch expression="X_val[0:281] " />
+      </configuration>
       <configuration name="PythonConfigurationType">
         <watch expression="x[30:65]" language="Python" />
         <watch expression="y" language="Python" />
@@ -443,51 +483,59 @@
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
       <expression>
-        <expression-string>list(set(self._new_names).difference(
-                                          set(self._ori_names)))</expression-string>
+        <expression-string>[i + window, i + window + days-1],[X[i + window], v]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>self._getNameIndexDict(list(df.columns),
-                                          list(set(df.columns).difference(
-                                              set(ori_names))))</expression-string>
+        <expression-string>[i + window, i + window + days-1],
+                     [X[i + window], v]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>DataLoaderTestCase._getNameIndexDict(df.columns,
-                                                       list(set(df.columns).difference(set(ori_names))))</expression-string>
+        <expression-string>(slope not in sorted_y[top:])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>np.round(Y[-1],4),np.round(d.iloc[-days:]['close'].values,4)</expression-string>
+        <expression-string>(slope not in sorted_y[:top])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>np.round(Y[0],4),np.round(d.iloc[window+1:window+1+days]['close'].values,4),np.round(X[0][:,0],4)</expression-string>
+        <expression-string>(slope not in sorted_y[:top]
+                                      and slope not in sorted_y[-top:])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>np.round(Y[0],4),np.round(d.iloc[window+1:window+1+days]['close'].values,4),np.round(X[0],4)</expression-string>
+        <expression-string>self._getNameIndexDict(self._full_names,
+                                      list(set(self._new_names).difference(
+                                          set(self._ori_names))))</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>np.round(Y[0],4),np.round(d.iloc[window+1:window+1+days]['close'].values,4)</expression-string>
+        <expression-string>DataLoader(code, benchmark, split=0,
+                                     start=dataloader._df_valid.index[
+                                         0].strftime('%Y-%m-%d'), online=True)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>np.round(Y[0],4),np.round(d.iloc[window+1:window+1+days].values,4)</expression-string>
+        <expression-string>DataLoader(code, benchmark, split=0, start=dataloader._df_valid.index[0].strftime('%Y-%m-%d'))</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>np.round(Y[-1],4),np.round(d.iloc[-days*2:]['close'].values,4)</expression-string>
+        <expression-string>dataloader._df_valid.index[0].strftime('%Y-%m-%d')</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>dataloader._df_valid.index[
+                                         0]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
@@ -553,47 +601,47 @@
     </expressions>
     <expressions id="evaluateExpression">
       <expression>
-        <expression-string>self._ori_names</expression-string>
+        <expression-string>QA.QA_indicator_OBV(df)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>self.features_appender.feature_columns</expression-string>
+        <expression-string>df.dropna()</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>self.features_appender.feature_columns().values()</expression-string>
+        <expression-string>pd.DataFrame(dataloader.get_train_data(window, days, True)[0][:1,0][0])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>self.features_appender.feature_columns.values()</expression-string>
+        <expression-string>dataloader.get_train_data(window, days, True)[0][:1,0][0]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>self.features_appender</expression-string>
+        <expression-string>dataloader.get_train_data(window, days, True)[0][:1][0]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>list(columns)</expression-string>
+        <expression-string>dataloader.get_train_data(window, days, True)[0][:1,0,0]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>sorted(Y)[:100]</expression-string>
+        <expression-string>dataloader.get_train_data(window, days, True)[0][:1,0]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>sorted(Y)</expression-string>
+        <expression-string>dataloader.get_train_data(window, days, True)[0][:1]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>data*days+X[i+window],X[i+window],data</expression-string>
+        <expression-string>dataloader.get_train_data(window, days, True)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -604,13 +652,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3876">
           <caret line="233" column="38" selection-start-line="233" selection-start-column="15" selection-end-line="233" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/pandas/core/indexing.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="1326" selection-start-line="1326" selection-end-line="1326" />
         </state>
       </provider>
     </entry>
@@ -652,13 +693,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/test_lstm.py" />
-    <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/QUANTAXIS/QAFetch/QATdx.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4351">
-          <caret line="245" column="4" selection-start-line="245" selection-start-column="4" selection-end-line="245" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/keras/engine/base_layer.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="8505">
@@ -670,13 +704,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
           <caret line="79" column="6" selection-start-line="79" selection-start-column="6" selection-end-line="79" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/pandas/core/generic.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="82042">
-          <caret line="4375" selection-start-line="4375" selection-end-line="4375" />
         </state>
       </provider>
     </entry>
@@ -694,38 +721,45 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/test_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="372">
-          <caret line="34" column="70" selection-start-line="34" selection-start-column="70" selection-end-line="34" selection-end-column="70" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LSTM_for_Stock/data_processor.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="86">
-          <caret line="7" column="28" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/test_dataLoader.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1900">
-          <caret line="109" selection-start-line="109" selection-end-line="109" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-            <marker date="1552960880638" expanded="true" signature="4925:5160" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/pandas/core/base.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="16967">
           <caret line="919" selection-start-line="919" selection-end-line="919" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/QUANTAXIS/QAFetch/QATdx.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4788">
+          <caret line="268" selection-start-line="268" selection-end-line="268" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/pandas/core/indexes/datetimelike.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6745">
+          <caret line="403" selection-start-line="403" selection-end-line="403" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/unittest/loader.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2888">
+          <caret line="162" selection-start-line="162" selection-end-line="162" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/pandas/core/generic.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="82042">
+          <caret line="4375" selection-start-line="4375" selection-end-line="4375" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/QUANTAXIS/QAIndicator/indicators.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="8094">
+          <caret line="431" selection-start-line="431" selection-end-line="431" />
         </state>
       </provider>
     </entry>
@@ -736,34 +770,72 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/LSTM_for_Stock/unit.py">
+    <entry file="file://$PROJECT_DIR$/tests/test_dataLoader.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="99">
-          <caret line="67" column="42" selection-start-line="67" selection-start-column="42" selection-end-line="67" selection-end-column="42" />
+        <state relative-caret-position="234">
+          <caret line="105" selection-start-line="105" selection-end-line="105" />
           <folding>
-            <element signature="e#0#29#0" expanded="true" />
-            <marker date="1553045621422" expanded="true" signature="815:1027" ph="..." />
+            <element signature="e#0#15#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/test_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="431">
+          <caret line="32" column="42" selection-start-line="19" selection-start-column="28" selection-end-line="34" selection-end-column="73" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/pandas/core/indexing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="174">
+          <caret line="1326" selection-start-line="1326" selection-end-line="1326" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/test_plot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="133">
-          <caret line="7" column="26" lean-forward="true" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
+        <state relative-caret-position="456">
+          <caret line="36" column="34" lean-forward="true" selection-start-line="36" selection-start-column="34" selection-end-line="36" selection-end-column="34" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
-            <marker date="1553045208566" expanded="true" signature="204:209" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/LSTM_for_Stock/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="484">
-          <caret line="141" column="70" selection-start-line="141" selection-start-column="60" selection-end-line="141" selection-end-column="70" />
+        <state relative-caret-position="-309">
+          <caret line="17" column="46" selection-start-line="17" selection-start-column="46" selection-end-line="17" selection-end-column="46" />
           <folding>
             <element signature="e#0#41#0" expanded="true" />
+            <element signature="e#377#1495#0" />
+            <element signature="e#4005#4679#0" />
+            <element signature="e#4732#5558#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LSTM_for_Stock/data_processor.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="764">
+          <caret line="205" column="45" selection-start-line="205" selection-start-column="35" selection-end-line="205" selection-end-column="45" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LSTM_for_Stock/unit.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="157">
+          <caret line="54" column="65" selection-start-line="54" selection-start-column="48" selection-end-line="54" selection-end-column="65" />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
           </folding>
         </state>
       </provider>

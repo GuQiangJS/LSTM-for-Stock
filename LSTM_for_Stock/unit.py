@@ -52,6 +52,48 @@ def calc_slope(arr):
     return np.array(result)
 
 
+def plot_result_by_pct_change(X, Y, window, days, figsize=(15, 5), top=100):
+    """按預測值的斜率繪圖
+
+    Args:
+        figsize: 繪圖大小。默認為(15,5)。
+        top (int): 繪製斜率**絕對值**前 n 位的線。默認100。
+    X: 真實值數組。
+           1. 三維數組。可以是從 `DataLoader.get_train_data`、
+           `DataLoader.get_valid_data` 中獲取到的X，或與之格式一致的均可。
+           計算時會取 `[:,0,0]` 來作為繪圖值。
+           2. 一維數組。直接使用。
+        Y: 預測值或未來值的數組。
+           如果是一維數組，默認每一項為待繪製的斜率值，直接使用該值進行繪圖。
+           如果是二維數組，會調用 `calc_slope` 將每一維的值計算為單一值，再當做斜率進行繪圖。
+    days (int): `Y` 及 `other_Y` 繪製之間跳過的數量。
+    other_Y: 其他與Y相同類型的二維數組。
+                （可能 `Y` 為真實的未來值；`other_Y` 為預測值）
+    window: 窗口期。繪圖時會先繪製X值，然後遍歷所有Y值得第一個維度，
+                每次跳空 `window` 值後開始繪製。
+    """
+    if len(X.shape) == 3:
+        X = X[:, 0, 0]
+    # if len(Y.shape) == 2:
+    #     sort_Y = [y[-1] - y[0] for y in Y]
+    fig = plt.figure(figsize=figsize)
+    ax = fig.add_subplot(111)
+    ax.plot(X, color='b')
+    for i, data in enumerate(Y):
+        try:
+            # if top > 0 and (data[-1] - data[0] not in sorted(sort_Y)[:top] and
+            #                 data[-1] - data[0] not in sorted(sort_Y)[-top:]):
+            #     continue
+            # 绘制预测值从开始点到结束点的直线
+            plt.plot([i + window, i + window + days - 1],
+                     [X[i + window], data[-1]],
+                     color=('r' if data[-1] > X[i + window] else 'g'))
+            # 绘制预测值从开始点到结束点的直线
+        except Exception:
+            continue
+    return plt
+
+
 def plot_result_by_slope(X, Y, window, days, figsize=(15, 5), top=100):
     """按預測值的斜率繪圖
 
@@ -81,13 +123,55 @@ def plot_result_by_slope(X, Y, window, days, figsize=(15, 5), top=100):
     ax.plot(X, color='b')
     for i, data in enumerate(Y):
         try:
-            if (data not in sorted(Y)[:top] and data not in sorted(Y)[-top:]):
+            if top > 0 and (data not in sorted(Y)[:top] and
+                            data not in sorted(Y)[-top:]):
                 continue
             v = data * days + X[i + window]
             # 绘制预测值从开始点到结束点的直线
-            plt.plot([i + window, i + window + days],
+            plt.plot([i + window, i + window + days - 1],
                      [X[i + window], v],
                      color=('r' if data > 0 else 'g'))
+            # 绘制预测值从开始点到结束点的直线
+        except Exception:
+            continue
+    return plt
+
+
+def plot_result(X, Y, window, days, figsize=(15, 5), top=100):
+    """按預測值的繪圖
+
+    Args:
+        figsize: 繪圖大小。默認為(15,5)。
+        top (int): 繪製**絕對值**前 n 位的線。默認100。
+    X: 真實值數組。
+           1. 三維數組。可以是從 `DataLoader.get_train_data`、
+           `DataLoader.get_valid_data` 中獲取到的X，或與之格式一致的均可。
+           計算時會取 `[:,0,0]` 來作為繪圖值。
+           2. 一維數組。直接使用。
+        Y : 預測值或未來值的數組。二維數組，每一維單獨繪製。
+    days (int): `Y` 及 `other_Y` 繪製之間跳過的數量。
+    other_Y: 其他與Y相同類型的二維數組。
+                （可能 `Y` 為真實的未來值；`other_Y` 為預測值）
+    window: 窗口期。繪圖時會先繪製X值，然後遍歷所有Y值得第一個維度，
+                每次跳空 `window` 值後開始繪製。
+    """
+    if len(X.shape) == 3:
+        X = X[:, 0, 0]
+    sorted_y = sorted(calc_slope(Y)) if len(Y.shape) == 2 else None
+    fig = plt.figure(figsize=figsize)
+    ax = fig.add_subplot(111)
+    ax.plot(X, color='b')
+    for i, data in enumerate(Y):
+        try:
+            slope = calc_slope([data])
+            if slope and top > 0 and (slope not in sorted_y[:top]
+                                      and slope not in sorted_y[-top:]):
+                continue
+            start = i + window - 1
+            skip = [None for j in range(start)]
+            # 绘制预测值从开始点到结束点的直线
+            plt.plot(skip + [X[start]] + list(data),
+                     color=('r' if slope > 0 else 'g'))
             # 绘制预测值从开始点到结束点的直线
         except Exception:
             continue
