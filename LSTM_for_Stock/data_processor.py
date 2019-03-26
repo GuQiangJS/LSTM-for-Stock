@@ -1,281 +1,288 @@
 import datetime
-from abc import abstractmethod
-
-import numpy as np
 import pandas as pd
-from QUANTAXIS import QA_fetch_index_day_adv as Fetch_index_adv
-from QUANTAXIS import QA_fetch_stock_day_adv as Fetch_stock_adv
-from QUANTAXIS.QAFetch.QATdx import QA_fetch_get_index_day as Fetch_index
-from QUANTAXIS.QAFetch.QATdx import QA_fetch_get_stock_day as Fetch_stock
-from sklearn.preprocessing import Normalizer
+import QUANTAXIS as QA
+import socket
 
 
-class FeaturesAppender(object):
-    """數據特征附加器
+class Wrapper(object):
+    """數據包裝器"""
 
-    """
-
-    def __init__(self, kwargs:dict={}):
-        self._full_names = []
-        self._ori_names = []
-        self._new_names = []
+    def __init__(self, kwargs: dict = {}):
         self.kwargs = kwargs
 
-    @abstractmethod
-    def appendFeautres(self, df) -> (pd.DataFrame, [str]):
-        return df, []
+    def build(self, df):
+        """數據處理
 
-    @property
-    def feature_columns(self) -> dict:
-        """附加的特征列的名稱和序號的字典。
-        這些列不會參與 `DataLoader` 的標準化處理。"""
-        return self._getNameIndexDict(self._full_names,
-                                      list(set(self._new_names).difference(
-                                          set(self._ori_names))))
+        Args:
+            df (pd.DataFrame): 待處理的數據
 
-    def append(self, df):
-        self._ori_names = list(df.columns)
-        self._new_names = []
-        df, self._new_names = self.appendFeautres(df)
-        self._full_names = list(df.columns)
+        Returns:
+            pd.DataFrame : 處理后的數據
+        """
         return df
 
-    def _getNameIndexDict(self, columns, names):
-        d = {}
-        if columns and names:
-            for name in names:
-                d[name] = columns.index(name)
-        return d
+
+class Wrapper_fillna(Wrapper):
+    def build(self, df):
+        """數據處理。
+        1. **向前**填充 stock 的数据。
+        2. 删除 stock 中依然为空的数据。（上市时间在benchmark之后的情况。）
+
+        Args:
+            df (pd.DataFrame): 待處理的數據
+
+        Returns:
+            pd.DataFrame : 處理后的數據
+        """
+        result = df.copy()
+        result = result.fillna(method='ffill')
+        return result.dropna()
 
 
 class DataLoader(object):
-    """數據讀取器
+    """數據提供器"""
+
+    @staticmethod
+    def today():
+        return datetime.datetime.today().strftime('%Y-%m-%d')
+
+
+class DataLoaderStock(DataLoader):
+    """股票數據提供器
 
     Args:
         stock_code (str): 股票代碼
         benchmark_code (str): 指數代碼
-        split (float): 訓練集+驗證集/測試集的拆分比率。（0<x<1）。默認為0.1。
-                       Example: 0.1 意味著保留10%的數據作為驗證集
-        columns (list): 獲取數據時保留的列名。
-                        當online為**True**時，為['close', 'open', 'high', 'low', 'vol']。
-                        否則是['close', 'open', 'high', 'low', 'volume']。
-                        **會取第一列為結果集**。
-        online (bool): 是否從網絡獲取數據。默認為（False）。
-                       從本地獲取的數據默認進行復權處理（前復權）。
-                       從網絡獲取數據不進行復權處理。
-        fq (str): 是否採用復權數據。默認為 前復權。如果不需要復權則傳入 `None`。
-        start (str): 數據開始日期。數據格式(`%Y-%m-%d`)。默認值 `1990-01-01`。
-        end (str): 數據結束日期。數據格式(`%Y-%m-%d`)。默認值 `當天`。
-        features_appender (FeaturesAppender) : 附加特征值使用的方法。
-                        接收的返回值為附加的特征列的名稱和序號的字典。
-
-    .. _pandas.DataFrame.fillna:
-        https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.fillna.html
+        fq (str, optional): Defaults to 'qfq'. 是否取復權數據。
+            * `qfq` - 前復權
+            * `hfq` - 后復權
+            * `bfq` or `None` - 不復權
+        online (bool, optional): Defaults to False. 是否獲取在線數據
+        start (str, optional): Defaults to '1990-01-01'. 開始日期
+        end (str, optional): Defaults to DataLoader.today(). 結束日期
+        
     """
 
-    def __init__(self, stock_code,
-                 benchmark_code,
-                 split=0.1,
-                 columns=None,
-                 online=False,
+    def __init__(self,
+                 stock_code,
+                 benchmark_code='399300',
                  fq='qfq',
+                 online=False,
                  start='1990-01-01',
-                 end=datetime.datetime.today().strftime('%Y-%m-%d'),
-                 features_appender=FeaturesAppender()):
-        columns = ['close', 'open', 'high', 'low', 'volume']
-        if not online:
-            self._stock_df = self._fetch_stock_adv(stock_code, start, end,
-                                                   fq=fq)
-            self._benchmark_df = self._fetch_index_adv(benchmark_code, start,
-                                                       end)
+                 end=DataLoader.today(),
+                 wrapper=Wrapper()):
+        """股票數據提供器
+        
+        Args:
+            stock_code (str): 股票代碼
+            benchmark_code (str, optional): Defaults to '399300'. 指數代碼
+            fq (str, optional): Defaults to 'qfq'. 是否取復權數據。
+                * `qfq` - 前復權
+                * `hfq` - 后復權
+                * `bfq` or `None` - 不復權
+            online (bool, optional): Defaults to False. 是否獲取在線數據
+            start (str, optional): Defaults to '1990-01-01'. 開始日期
+            end (str, optional): Defaults to DataLoader.today(). 結束日期
+            wrapper (Wrapper, optional): Defaults to Wrapper(). `DataFrame`包装器。
+        """
+        self.__stock_code = stock_code
+        self.__benchmark_code = benchmark_code
+        self.__online = online
+        self.__start = start
+        self.__end = end
+        self.__fq = fq
+        self.__wrapper = wrapper
+        self.__data_raw = pd.DataFrame()
+        self.__data = pd.DataFrame()
+        self.__loaded=False
+
+    def load(self) -> pd.DataFrame:
+        """读取数据。拼接 stock 和 benchmark 的数据。
+        *以 benchmark 的数据作为左侧数据源， stock 的数据作为右侧数据源*。
+        **合并后会调用 `self.__wrapper.build` 方法对数据源进行包装。
+        
+        Returns:
+            pd.DataFrame: 合并后的数据。返回的数据与 `self.data` 一致。
+        """
+        if self.__online:
+            stock_df = self.__fetch_stock_day_online()
+            bench_df = self.__fetch_index_day_online()
         else:
-            self._stock_df = self._fetch_stock_online(stock_code, start, end)
-            self._benchmark_df = self._fetch_index_online(benchmark_code, start,
-                                                          end)
+            stock_df = self.__fetch_stock_day()
+            bench_df = self.__fetch_index_day()
+        self.__data_raw = bench_df.join(stock_df, lsuffix='_bench')
+        self.__data = self.__data_raw.copy()
+        if self.__wrapper:
+            self.__data = self.__wrapper.build(self.__data)
+        self.__loaded=True
+        return self.__data
 
-        self.stock_code = stock_code
-        self.benchmark_code = benchmark_code
-        # 完整數據
-        self.data = self._stock_df[columns].join(self._benchmark_df[columns],
-                                                 rsuffix='_benchmark')
-        self.features_appender = FeaturesAppender() if features_appender is None else features_appender  #
-        if self.features_appender:
-            self.data = self.features_appender.append(self.data)
-        self.data = self.data[self.data.index >= self._benchmark_df.index[0]]
-        # 训訓練集+測試集的分割下標
-        self._len_split = int(len(self.data) * (1 - split))
-        # # 丟棄了測試用列的數據源
-        # d = self.data.drop(columns=[val_column_name])
-        # 訓練集+测试集可用數據
-        self._np_train = self.data.values[:self._len_split]
-        self._df_train = self.data[:self._len_split]  # 訓練集+測試集的`DataFrame`格式
-        self.len_train = len(self._np_train)  # 訓練集+测试集大小
-        # 保留的验证集可用數據
-        self._np_valid = self.data.values[self._len_split:]
-        self._df_valid = self.data[self._len_split:]  # 保留的验证集的`DataFrame`格式
-        self.len_valid = len(self._np_valid)  # 保留的验证集大小
+    @property
+    def loaded(self)->bool:
+        """是否已经读取过数据"""
+        return self.__loaded
 
+
+    @property
+    def data_raw(self)->pd.DataFrame:
+        if not self.loaded:
+            self.load()
+        return self.__data_raw
+
+    @property
+    def data(self) -> pd.DataFrame:
+        if not self.loaded:
+            self.load()
+        return self.__data
+
+    @property
+    def stock_code(self) -> str:
+        return self.__stock_code
+
+    @property
+    def benchmark_code(self) -> str:
+        return self.__benchmark_code
+
+    @property
+    def start(self) -> str:
+        return self.__start
+
+    @property
+    def end(self) -> str:
+        return self.__end
+
+    @property
+    def online(self) -> bool:
+        return self.__online
+
+    @property
+    def fq(self) -> str:
+        return self.__fq
+
+    def __fetch_stock_day(self) -> pd.DataFrame:
+        """獲取本地的股票日線數據。會丟棄 `code` 列，并根據 `self.__fq` 來確定是否取復權數據。
+        返回列名：_stock_columns
+        """
+        d = QA.QA_fetch_stock_day_adv(
+            self.__stock_code, start=self.__start, end=self.__end)
+        if self.__fq == 'qfq':
+            df = d.to_qfq()
+        elif self.__fq == 'hfq':
+            df = d.to_hfq()
+        else:
+            df = d.data
+        #原始列名['open', 'high', 'low', 'close', 'volume', 'amount', 'preclose', 'adj']
+        df = df.reset_index().drop(columns=['code']).set_index('date')
+        return df[self._stock_columns]
+
+    def __fetch_index_day(self) -> pd.DataFrame:
+        """獲取本地的指數日線數據。會丟棄 `code` 列。
+        返回列名：_index_columns"""
+        d = QA.QA_fetch_index_day_adv(
+            self.__benchmark_code, start=self.__start, end=self.__end)
+        df = d.data.reset_index().drop(columns=['code']).set_index('date')
+        #原始列名['open', 'high', 'low', 'close', 'up_count', 'down_count', 'volume','amount'],
+        return df[self._index_columns]
+
+    @property
+    def _index_columns(self) -> [str]:
+        return [
+            'open', 'high', 'low', 'close', 'volume', 'amount', 'up_count',
+            'down_count'
+        ]
+
+    @property
+    def _stock_columns(self) -> [str]:
+        return ['open', 'high', 'low', 'close', 'volume', 'amount']
+
+    def __fetch_stock_day_online(self, times=5) -> pd.DataFrame:
+        """讀取股票在線日線數據。
+            times (int, optional): Defaults to 5. 重試次數
+        返回列名：_stock_columns。
+        """
+        retries = 0
+        while True:
+            try:
+                d = QA.QAFetch.QATdx.QA_fetch_get_stock_day(
+                    self.__stock_code, self.__start, self.__end)
+                #原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'code', 'date', 'date_stamp']
+                return d.rename(columns={'vol': 'volume'})[self._stock_columns]
+            except socket.timeout:
+                if retries < times:
+                    retries = retries + 1
+                    continue
+                raise
+
+    def __fetch_index_day_online(self, times=5) -> pd.DataFrame:
+        """讀取指數在線日線數據。
+            times (int, optional): Defaults to 5. 重試次數
+        返回列名：_index_columns。
+        """
+        retries = 0
+        while True:
+            try:
+                d = QA.QAFetch.QATdx.QA_fetch_get_index_day(
+                    self.__benchmark_code, self.__start, self.__end)
+                #原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'up_count', 'down_count', 'date', 'code', 'date_stamp']
+                return d.rename(columns={'vol': 'volume'})[self._index_columns]
+            except socket.timeout:
+                if retries < times:
+                    retries = retries + 1
+                    continue
+                raise
+
+
+class DataHelper(object):
     @staticmethod
-    def _index_to_datetime(df):
-        df.index = df.index.astype('datetime64[ns]')
-        return df
-
-    def get_valid_data(self, window_size, test_size, normalize):
-        """按照給定的窗口大小獲取验证集的X,Y。
-        X的大小為窗口大小，Y為窗口期最後一項。
+    def train_test_split(df,
+                         col='close',
+                         train_size=0.85,
+                         window=10,
+                         days=3,
+                         start=None,
+                         end=None):
+        """拆分训练集和测试集。
+        
         Args:
-            test_size: 測試數據大小
-            normalize: 是否執行正則化
-            window_size: 窗口大小
+            df (pd.DataFrame): 数据源
+            col (str): Defaults to close. 结果集中取的列名
+            train_size (float, optional): Defaults to 0.85. 训练集比率。应该在 0.0 ~ 1.0 之间。
+            window (int, optional): Defaults to 10. 窗口期日期长度。拆分后的训练集/测试集中每一个单一项会包含多少个日期的数据。
+            days (int, optional): Defaults to 3. 结果日期长度。拆分后的结果集中每一个单一项会包含多少个日期的数据。
+            start (int, optional): Defaults to None. 从 `self.data` 中取值的开始下标。
+            end (int, optional): Defaults to None. 从 `self.data` 中取值的结束下标。
 
         Returns:
-            np.array,np.array: x:三維數組，第一維尺寸是 總拆分的數量；
-                                           第二維尺寸是 window_size；
-                                           第三維尺寸是 總共的測試特性數據量；
-                               y:二維數組，第一維尺寸與 x 一致。
-                                           第二維尺寸是 test_size。
+            [[pd.DataFrame],[pd.Series],[pd.DataFrame],[pd.Series]]: 训练集X,训练集Y,测试集X,测试集Y
         """
-        data_x = []
-        data_y = []
-        for i in range(self.len_valid - window_size - test_size):
-            x, y = self._next_window(self._np_valid,
-                                     i,
-                                     window_size,
-                                     test_size,
-                                     normalize)
-            data_x.append(x)
-            data_y.append(y)
-        return np.array(data_x), np.array(data_y)
+        if train_size is None:
+            train_size = 0.85
 
-    def get_train_data(self, window_size, test_size, normalize):
-        """按照給定的窗口大小獲取訓練集+测试集的X,Y。
-        X的大小為窗口大小，Y為窗口期最後一項。
-        Args:
-            test_size: 測試數據大小
-            normalize: 是否執行正則化
-            window_size: 窗口大小
+        if df.empty:
+            raise ValueError('df is empty')
+        if not col:
+            col = 'close'
+        if col not in df.columns:
+            raise ValueError('{0} not in df.columns'.format(col))
 
-        Returns:
-            np.array,np.array: x:三維數組，第一維尺寸是 總拆分的數量；
-                                           第二維尺寸是 window_size；
-                                           第三維尺寸是 總共的測試特性數據量；
-                               y:二維數組，第一維尺寸與 x 一致。
-                                           第二維尺寸是 test_size。
-        """
-        data_x = []
-        data_y = []
-        # range方法取值会少1，所以最后需要+1
-        for i in range(self.len_train - window_size - test_size + 1):
-            x, y = self._next_window(self._np_train,
-                                     i,
-                                     window_size,
-                                     test_size,
-                                     normalize)
-            data_x.append(x)
-            data_y.append(y)
-        return np.array(data_x), np.array(data_y)
-
-    def _next_window(self, arr, start, window_size, test_size, normalize):
-        """按照指定起始位置和長度構建X,Y
-        Args:
-            arr (np.array): 待拆分的数据集
-            test_size (int): 結果列長度
-            normalize (bool): 是否執行規則化
-            start (int): 起始位置
-            window_size (int): 窗口長度
-        Return:
-            np.array,np.array: x:二維數組，第一維是 window_size 大小；
-                                           第二維是 總共的測試特性數據量；
-                               y:一維數組，test_size 大小。
-                               **為 i+window_size開始往後的 test_size 的值。**
-        """
-
-        '''
-        y取值時會去 self.data 中取值，因為如果 start+window_size+test_size
-        的值超過了 _np_train 的取值範圍時會報錯。
-        但是當 start+window_size+test_size 的值過大，超過了 data 的尺寸時，
-        依然會報錯。這裡就涉及到了構造函數傳入的 split 值，如果過小或者
-        數據集本身就很小而window_size或者test_size過大就可能造成此問題。
-       '''
-        # 首先從i開始取出window_size+test_size長度的數據
-        window = np.copy(arr[start:start + window_size + test_size])
-        if normalize:
-            # 分別對每一列做標準化
-            for j in range(window.shape[1]):
-                if self.features_appender and j not in self.features_appender.feature_columns.values():
-                    window[:, j] = Normalizer().fit_transform([window[:, j]])[0]
-        # 取數據的前一部分為x
-        x = window[:-test_size]
-        # 取數據的最後 test_size 部分的第一列為y。
-        # 第一列被標記在構造函數的columns參數中。
-        y = window[-test_size:, [0]][:, 0]
-        return x, y
-
-    @property
-    def start(self):
-        """獲取當前數據的開始日期。如果沒有數據則返回None。"""
-        return self.data.index[0] if not self.data.empty else None
-
-    @property
-    def end(self):
-        """獲取當前數據的結束日期。如果沒有數據則返回None。"""
-        return self.data.index[-1] if not self.data.empty else None
-
-    def _fetch_stock_online(self, code, start, end):
-        df = Fetch_stock(code, start, end).rename(columns={'vol': 'volume'})
-        return DataLoader._index_to_datetime(df)
-
-    def _fetch_index_online(self, code, start, end):
-        df = Fetch_index(code, start, end).rename(columns={'vol': 'volume'})
-        return DataLoader._index_to_datetime(df)
-
-    def _fetch_stock_adv(self, code, start, end, fq, drop_code=True):
-        """讀取股票日線。
-        讀取時會使用 `QA_DataStruct_Stock_day` 類型 填充 `self._stock_data`
-
-        Args:
-            code: 代碼
-            start: 開始日期。%Y-%m-%d
-            end: 結束日期。%Y-%m-%d
-            fq: 是否採用復權數據。默認為 前復權。如果不需要復權則傳入 `None`。
-            drop_code: 是否丟棄index中的code列
-
-        Returns:
-            pd.DataFrame: 日線數據表
-        """
-        # QA_DataStruct_Stock_day類型
-        self._stock_data = Fetch_stock_adv(code, start, end)
-        if fq == 'qfq':
-            dataframe = self._stock_data.to_qfq()
-        elif fq == 'hfq':
-            dataframe = self._stock_data.to_hfq()
+        if not start and not end:
+            #开始/结束的下标均为空，表示取所有
+            df_tmp = df.copy()
+        elif not start:
+            df_tmp = df.copy().iloc[start:]
+        elif not end:
+            df_tmp = df.copy().iloc[:end]
         else:
-            dataframe = self._stock_data.data
+            df_tmp = df.copy().iloc[start:end]
+        X = []
+        Y = []
+        X_columns = [c for c in df_tmp.columns if c != col]
+        for i in range(df_tmp.shape[0]):
+            if i + window + days > df_tmp.shape[0]:
+                break
+            X.append(df_tmp.iloc[i:i + window][X_columns])
+            Y.append(df_tmp.iloc[i + window:i + window + days][col])
 
-        if drop_code:
-            dataframe = dataframe.reset_index()
-            return dataframe.drop(columns=['code']).set_index('date')
-        else:
-            return dataframe
-
-    def _fetch_index_adv(self, code, start, end, drop_code=True):
-        """讀取指數日線
-        讀取時會使用 `QA_DataStruct_Stock_day` 類型 填充 `self._benchmark_data`
-
-        Args:
-            code: 代碼
-            start: 開始日期。%Y-%m-%d
-            end: 結束日期。%Y-%m-%d
-            drop_code: 是否丟棄index中的code列
-
-        Returns:
-            pd.DataFrame: 日線數據表
-        """
-        # QA_DataStruct_Stock_day類型
-        self._benchmark_data = Fetch_index_adv(code, start, end)
-        if drop_code:
-            return self._benchmark_data.data.reset_index() \
-                .drop(columns=['code']) \
-                .set_index('date')
-        else:
-            return self._benchmark_data.data
+        train_end_index = round(train_size * len(X))  #训练集结束的位置
+        return (X[:train_end_index], Y[:train_end_index], X[train_end_index:],
+                Y[train_end_index:])

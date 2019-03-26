@@ -3,17 +3,20 @@ from keras.layers import Dense
 from keras.layers import Dropout
 from keras.layers import LSTM
 from keras.models import Sequential
-
-from .unit import get_param_default_value as _dv
+from LSTM_for_Stock.unit import get_param_default_value as def_val
 
 
 class Model(object):
-    """
+    pass
 
-    """
 
+class SequentialModel(Model):
     def __init__(self):
-        self.model = Sequential()
+        self.__model = Sequential()
+
+    @property
+    def model(self):
+        return self.__model
 
     def build_model(self, layers, compile={}):
         """根據配置項構建 `self.model`。
@@ -38,20 +41,25 @@ class Model(object):
             t = layer.pop('type')
             if t == 'dense':
                 # https://keras.io/zh/layers/core/
-                self.model.add(Dense.from_config(layer))
+                self.__model.add(Dense.from_config(layer))
             elif t == 'lstm':
                 # https://keras.io/zh/layers/recurrent/#lstm
-                self.model.add(LSTM.from_config(layer))
+                self.__model.add(LSTM.from_config(layer))
             elif t == 'dropout':
                 # https://keras.io/zh/layers/recurrent/#Dropout
-                self.model.add(Dropout.from_config(layer))
+                self.__model.add(Dropout.from_config(layer))
 
         # https://keras.io/zh/models/model/#compile
-        self.model.compile(**compile)
+        self.__model.compile(**compile)
 
-    def train(self, X, Y, train={},
-              callbacks=[EarlyStopping(monitor="loss",
-                                       patience=10, verbose=1, mode="auto")]):
+    def train(self,
+              X,
+              Y,
+              train={},
+              callbacks=[
+                  EarlyStopping(
+                      monitor="loss", patience=10, verbose=1, mode="auto")
+              ]):
         """訓練模型
 
         Args:
@@ -69,35 +77,40 @@ class Model(object):
         https://keras.io/zh/callbacks/#history
         """
         epochs = train.pop('epochs', 100)
-        batch_size = train.pop('batch_size', _dv(self.model.fit, 'batch_size'))
-        verbose = train.pop('verbose', _dv(self.model.fit, 'verbose'))
-        validation_split = train.pop('validation_split',
-                                     _dv(self.model.fit, 'validation_split'))
-        validation_data = train.pop('validation_data',
-                                    _dv(self.model.fit, 'validation_data'))
-        shuffle = train.pop('shuffle', _dv(self.model.fit, 'shuffle'))
+        batch_size = train.pop('batch_size',
+                               def_val(self.__model.fit, 'batch_size'))
+        verbose = train.pop('verbose', def_val(self.__model.fit, 'verbose'))
+        validation_split = train.pop(
+            'validation_split', def_val(self.__model.fit, 'validation_split'))
+        validation_data = train.pop(
+            'validation_data', def_val(self.__model.fit, 'validation_data'))
+        shuffle = train.pop('shuffle', def_val(self.__model.fit, 'shuffle'))
         class_weight = train.pop('class_weight',
-                                 _dv(self.model.fit, 'class_weight'))
+                                 def_val(self.__model.fit, 'class_weight'))
         sample_weight = train.pop('sample_weight',
-                                  _dv(self.model.fit, 'sample_weight'))
+                                  def_val(self.__model.fit, 'sample_weight'))
         initial_epoch = train.pop('initial_epoch',
-                                  _dv(self.model.fit, 'initial_epoch'))
-        steps_per_epoch = train.pop('steps_per_epoch',
-                                    _dv(self.model.fit, 'steps_per_epoch'))
-        validation_steps = train.pop('validation_steps',
-                                     _dv(self.model.fit, 'validation_steps'))
-        self.history = self.model.fit(X, Y, epochs=epochs, callbacks=callbacks,
-                                      batch_size=batch_size, verbose=verbose,
-                                      validation_data=validation_data,
-                                      validation_split=validation_split,
-                                      shuffle=shuffle,
-                                      class_weight=class_weight,
-                                      sample_weight=sample_weight,
-                                      initial_epoch=initial_epoch,
-                                      steps_per_epoch=steps_per_epoch,
-                                      validation_steps=validation_steps)
+                                  def_val(self.__model.fit, 'initial_epoch'))
+        steps_per_epoch = train.pop(
+            'steps_per_epoch', def_val(self.__model.fit, 'steps_per_epoch'))
+        validation_steps = train.pop(
+            'validation_steps', def_val(self.__model.fit, 'validation_steps'))
+        self.history = self.__model.fit(
+            X,
+            Y,
+            epochs=epochs,
+            callbacks=callbacks,
+            batch_size=batch_size,
+            verbose=verbose,
+            validation_data=validation_data,
+            validation_split=validation_split,
+            shuffle=shuffle,
+            class_weight=class_weight,
+            sample_weight=sample_weight,
+            initial_epoch=initial_epoch,
+            steps_per_epoch=steps_per_epoch,
+            validation_steps=validation_steps)
 
-        self.model.summary()
         return self.history
 
     def predict(self, X, predict={}):
@@ -114,12 +127,13 @@ class Model(object):
         .. _predict:
         https://keras.io/zh/models/model/#predict
         """
-        steps = predict.pop('steps', _dv(self.model.predict, 'steps'))
+        steps = predict.pop('steps', def_val(self.__model.predict, 'steps'))
         batch_size = predict.pop('batch_size',
-                                 _dv(self.model.predict, 'batch_size'))
-        verbose = predict.pop('verbose', _dv(self.model.predict, 'verbose'))
-        return self.model.predict(X, batch_size=batch_size, verbose=verbose,
-                                  steps=steps)
+                                 def_val(self.__model.predict, 'batch_size'))
+        verbose = predict.pop('verbose',
+                              def_val(self.__model.predict, 'verbose'))
+        return self.__model.predict(
+            X, batch_size=batch_size, verbose=verbose, steps=steps)
 
     def evaluate(self, X, Y, evaluate={}):
         """計算模型誤差
@@ -135,11 +149,17 @@ class Model(object):
         .. _evaluate:
         https://keras.io/zh/models/model/#evaluate
         """
-        steps = evaluate.pop('steps', _dv(self.model.evaluate, 'steps'))
-        sample_weight = evaluate.pop('sample_weight', _dv(
-            self.model.evaluate, 'sample_weight'))
+        steps = evaluate.pop('steps', def_val(self.__model.evaluate, 'steps'))
+        sample_weight = evaluate.pop(
+            'sample_weight', def_val(self.__model.evaluate, 'sample_weight'))
         batch_size = evaluate.pop('batch_size',
-                                  _dv(self.model.evaluate, 'batch_size'))
-        verbose = evaluate.pop('verbose', _dv(self.model.evaluate, 'verbose'))
-        return self.model.evaluate(X, Y, batch_size=batch_size, verbose=verbose,
-                                   steps=steps, sample_weight=sample_weight)
+                                  def_val(self.__model.evaluate, 'batch_size'))
+        verbose = evaluate.pop('verbose',
+                               def_val(self.__model.evaluate, 'verbose'))
+        return self.__model.evaluate(
+            X,
+            Y,
+            batch_size=batch_size,
+            verbose=verbose,
+            steps=steps,
+            sample_weight=sample_weight)
