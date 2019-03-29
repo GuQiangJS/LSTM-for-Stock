@@ -1,7 +1,8 @@
 import datetime
-import pandas as pd
-import QUANTAXIS as QA
 import socket
+
+import QUANTAXIS as QA
+import pandas as pd
 
 
 class Wrapper(object):
@@ -94,7 +95,7 @@ class DataLoaderStock(DataLoader):
         self.__wrapper = wrapper
         self.__data_raw = pd.DataFrame()
         self.__data = pd.DataFrame()
-        self.__loaded=False
+        self.__loaded = False
 
     def load(self) -> pd.DataFrame:
         """读取数据。拼接 stock 和 benchmark 的数据。
@@ -114,17 +115,16 @@ class DataLoaderStock(DataLoader):
         self.__data = self.__data_raw.copy()
         if self.__wrapper:
             self.__data = self.__wrapper.build(self.__data)
-        self.__loaded=True
+        self.__loaded = True
         return self.__data
 
     @property
-    def loaded(self)->bool:
+    def loaded(self) -> bool:
         """是否已经读取过数据"""
         return self.__loaded
 
-
     @property
-    def data_raw(self)->pd.DataFrame:
+    def data_raw(self) -> pd.DataFrame:
         if not self.loaded:
             self.load()
         return self.__data_raw
@@ -171,7 +171,7 @@ class DataLoaderStock(DataLoader):
             df = d.to_hfq()
         else:
             df = d.data
-        #原始列名['open', 'high', 'low', 'close', 'volume', 'amount', 'preclose', 'adj']
+        # 原始列名['open', 'high', 'low', 'close', 'volume', 'amount', 'preclose', 'adj']
         df = df.reset_index().drop(columns=['code']).set_index('date')
         return df[self._stock_columns]
 
@@ -181,7 +181,7 @@ class DataLoaderStock(DataLoader):
         d = QA.QA_fetch_index_day_adv(
             self.__benchmark_code, start=self.__start, end=self.__end)
         df = d.data.reset_index().drop(columns=['code']).set_index('date')
-        #原始列名['open', 'high', 'low', 'close', 'up_count', 'down_count', 'volume','amount'],
+        # 原始列名['open', 'high', 'low', 'close', 'up_count', 'down_count', 'volume','amount'],
         return df[self._index_columns]
 
     @property
@@ -205,7 +205,7 @@ class DataLoaderStock(DataLoader):
             try:
                 d = QA.QAFetch.QATdx.QA_fetch_get_stock_day(
                     self.__stock_code, self.__start, self.__end)
-                #原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'code', 'date', 'date_stamp']
+                # 原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'code', 'date', 'date_stamp']
                 return d.rename(columns={'vol': 'volume'})[self._stock_columns]
             except socket.timeout:
                 if retries < times:
@@ -223,7 +223,7 @@ class DataLoaderStock(DataLoader):
             try:
                 d = QA.QAFetch.QATdx.QA_fetch_get_index_day(
                     self.__benchmark_code, self.__start, self.__end)
-                #原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'up_count', 'down_count', 'date', 'code', 'date_stamp']
+                # 原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'up_count', 'down_count', 'date', 'code', 'date_stamp']
                 return d.rename(columns={'vol': 'volume'})[self._index_columns]
             except socket.timeout:
                 if retries < times:
@@ -235,38 +235,33 @@ class DataLoaderStock(DataLoader):
 class DataHelper(object):
     @staticmethod
     def train_test_split(df,
-                         col='close',
+                         batch,
                          train_size=0.85,
-                         window=10,
-                         days=3,
                          start=None,
                          end=None):
         """拆分训练集和测试集。
         
         Args:
             df (pd.DataFrame): 数据源
-            col (str): Defaults to close. 结果集中取的列名
+            batch (int): 每一批次的数据量。一般来说是window+days。
+                window: 窗口期日期长度。拆分后的训练集/测试集中每一个单一项会包含多少个日期的数据。
+                days: 结果日期长度。拆分后的结果集中每一个单一项会包含多少个日期的数据。
             train_size (float, optional): Defaults to 0.85. 训练集比率。应该在 0.0 ~ 1.0 之间。
-            window (int, optional): Defaults to 10. 窗口期日期长度。拆分后的训练集/测试集中每一个单一项会包含多少个日期的数据。
-            days (int, optional): Defaults to 3. 结果日期长度。拆分后的结果集中每一个单一项会包含多少个日期的数据。
             start (int, optional): Defaults to None. 从 `self.data` 中取值的开始下标。
             end (int, optional): Defaults to None. 从 `self.data` 中取值的结束下标。
+            norm (func, optional): Defaults to None. 对每一批次的数据（X+Y）执行标准化的方法。
 
         Returns:
-            [[pd.DataFrame],[pd.Series],[pd.DataFrame],[pd.Series]]: 训练集X,训练集Y,测试集X,测试集Y
+            [[pd.DataFrame],[pd.DataFrame]]: 训练集X+Y,测试集X+Y
         """
         if train_size is None:
             train_size = 0.85
 
         if df.empty:
             raise ValueError('df is empty')
-        if not col:
-            col = 'close'
-        if col not in df.columns:
-            raise ValueError('{0} not in df.columns'.format(col))
 
         if not start and not end:
-            #开始/结束的下标均为空，表示取所有
+            # 开始/结束的下标均为空，表示取所有
             df_tmp = df.copy()
         elif not start:
             df_tmp = df.copy().iloc[start:]
@@ -275,14 +270,10 @@ class DataHelper(object):
         else:
             df_tmp = df.copy().iloc[start:end]
         X = []
-        Y = []
-        X_columns = [c for c in df_tmp.columns if c != col]
         for i in range(df_tmp.shape[0]):
-            if i + window + days > df_tmp.shape[0]:
+            if i + batch > df_tmp.shape[0]:
                 break
-            X.append(df_tmp.iloc[i:i + window][X_columns])
-            Y.append(df_tmp.iloc[i + window:i + window + days][col])
+            X.append(df_tmp[i:i + batch])  # 当前取出需要分割为X，Y的批次数据
 
-        train_end_index = round(train_size * len(X))  #训练集结束的位置
-        return (X[:train_end_index], Y[:train_end_index], X[train_end_index:],
-                Y[train_end_index:])
+        train_end_index = round(train_size * len(X))  # 训练集结束的位置
+        return (X[:train_end_index], X[train_end_index:],)

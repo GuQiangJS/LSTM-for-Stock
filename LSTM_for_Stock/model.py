@@ -13,10 +13,15 @@ class Model(object):
 class SequentialModel(Model):
     def __init__(self):
         self.__model = Sequential()
+        self.__history=None
 
     @property
     def model(self):
         return self.__model
+
+    @property
+    def history(self):
+        return self.__history
 
     def build_model(self, layers, compile={}):
         """根據配置項構建 `self.model`。
@@ -74,7 +79,7 @@ class SequentialModel(Model):
         .. _fit:
         https://keras.io/zh/models/model/#fit
         .. _History:
-        https://keras.io/zh/callbacks/#history
+        https://keras.io/zh/callbacks/#__history
         """
         epochs = train.pop('epochs', 100)
         batch_size = train.pop('batch_size',
@@ -95,7 +100,7 @@ class SequentialModel(Model):
             'steps_per_epoch', def_val(self.__model.fit, 'steps_per_epoch'))
         validation_steps = train.pop(
             'validation_steps', def_val(self.__model.fit, 'validation_steps'))
-        self.history = self.__model.fit(
+        self.__history = self.__model.fit(
             X,
             Y,
             epochs=epochs,
@@ -111,7 +116,7 @@ class SequentialModel(Model):
             steps_per_epoch=steps_per_epoch,
             validation_steps=validation_steps)
 
-        return self.history
+        return self.__history
 
     def predict(self, X, predict={}):
         """模型預測
