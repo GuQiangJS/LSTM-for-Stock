@@ -23,7 +23,8 @@ def test_train_test_split_1():
         dic['v'].append(i)
     df = pd.DataFrame.from_dict(dic)
     batch_size = 6
-    train, test = DataHelper.train_test_split(df, batch_size=batch_size, train_size=1)
+    train, test = DataHelper.train_test_split(df, batch_size=batch_size,
+                                              train_size=1)
     # logging.info(train_X)
     # logging.info(train_Y)
     assert train is not None
@@ -32,8 +33,8 @@ def test_train_test_split_1():
     assert len(test) == 0
     # 判断内容是否正确
     for i in range(2):
-        assert train[i].size == batch_size
-        assert arr_eq(train[i]['v'].values, arr(dic['v'][i:i + batch_size]))
+        for k in dic.keys():
+            assert train[i][k].size == batch_size
 
 
 def test_train_test_split_2():
@@ -79,8 +80,8 @@ def test_train_test_split_3():
     assert len(train) == 6
     assert len(test) == 0
     for i in range(6):
-        assert train[i].size == batch_size
-        assert arr_eq(train[i]['v'].values, arr(dic['v'][i:i + batch_size]))
+        for k in dic.keys():
+            assert train[i][k].size == batch_size
 
 
 def test_train_test_split_4():
@@ -100,18 +101,19 @@ def test_train_test_split_4():
         dic['v'].append(i)
     df = pd.DataFrame.from_dict(dic)
     batch_size = 6
-    train, test = DataHelper.train_test_split(df, batch_size=batch_size, train_size=0.6)
+    train, test = DataHelper.train_test_split(df, batch_size=batch_size,
+                                              train_size=0.6)
     assert train is not None
     assert test is not None
     assert len(train) == 4
     assert len(test) == 2
     for i in range(6):
         if i + 1 <= 4:
-            assert train[i].size == batch_size
-            assert arr_eq(train[i]['v'].values, arr(dic['v'][i:i + batch_size]))
+            for k in dic.keys():
+                assert train[i][k].size == batch_size
         else:
-            assert test[i - 4].size == batch_size
-            assert arr_eq(test[i - 4]['v'].values, arr(dic['v'][i:i + batch_size]))
+            for k in dic.keys():
+                assert test[i - 4][k].size == batch_size
 
 
 def test_train_test_split_5():
@@ -133,7 +135,8 @@ def test_train_test_split_5():
         dic['v'].append(i)
     df = pd.DataFrame.from_dict(dic)
     batch_size = 6
-    train, test = DataHelper.train_test_split(df, batch_size=batch_size, train_size=0.5, )
+    train, test = DataHelper.train_test_split(df, batch_size=batch_size,
+                                              train_size=0.5, )
     # logging.info(train_X)
     # logging.info(train_Y)
     # 总共12条数据，根据训练集0.6的比率，训练集为6条，测试集为6条
@@ -145,11 +148,11 @@ def test_train_test_split_5():
     assert len(test) == 4
     for i in range(6):
         if i + 1 <= 4:
-            assert train[i].size == batch_size
-            assert arr_eq(train[i]['v'].values, arr(dic['v'][i:i + batch_size]))
+            for k in dic.keys():
+                assert train[i][k].size == batch_size
         else:
-            assert test[i - 4].size == batch_size
-            assert arr_eq(test[i - 4]['v'].values, arr(dic['v'][i:i + batch_size]))
+            for k in dic.keys():
+                assert test[i - 4][k].size == batch_size
 
 
 def test_train_test_split_6():
@@ -176,11 +179,11 @@ def test_train_test_split_6():
     assert len(test) == 1
     for i in range(7):
         if i + 1 <= 7:
-            assert train[i].size == batch_size
-            assert arr_eq(train[i]['v'].values, arr(dic['v'][i:i + batch_size]))
+            for k in dic.keys():
+                assert train[i][k].size == batch_size
         else:
-            assert test[i - 7].size == batch_size
-            assert arr_eq(test[i - 7]['v'].values, arr(dic['v'][i:i + batch_size]))
+            for k in dic.keys():
+                assert test[i - 7][k].size == batch_size
 
 
 def test_dataframe_series_to_array():

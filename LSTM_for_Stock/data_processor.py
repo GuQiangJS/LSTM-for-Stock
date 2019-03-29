@@ -276,4 +276,4 @@ class DataHelper(object):
             X.append(df_tmp[i:i + batch_size])  # 当前取出需要分割为X，Y的批次数据
 
         train_end_index = round(train_size * len(X))  # 训练集结束的位置
-        return (X[:train_end_index], X[train_end_index:],)
+        return X[:train_end_index], X[train_end_index:]
