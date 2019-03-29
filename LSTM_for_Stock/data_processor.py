@@ -235,7 +235,7 @@ class DataLoaderStock(DataLoader):
 class DataHelper(object):
     @staticmethod
     def train_test_split(df,
-                         batch,
+                         batch_size,
                          train_size=0.85,
                          start=None,
                          end=None):
@@ -243,7 +243,7 @@ class DataHelper(object):
         
         Args:
             df (pd.DataFrame): 数据源
-            batch (int): 每一批次的数据量。一般来说是window+days。
+            batch_size (int): 每一批次的数据量。一般来说是window+days。
                 window: 窗口期日期长度。拆分后的训练集/测试集中每一个单一项会包含多少个日期的数据。
                 days: 结果日期长度。拆分后的结果集中每一个单一项会包含多少个日期的数据。
             train_size (float, optional): Defaults to 0.85. 训练集比率。应该在 0.0 ~ 1.0 之间。
@@ -271,9 +271,9 @@ class DataHelper(object):
             df_tmp = df.copy().iloc[start:end]
         X = []
         for i in range(df_tmp.shape[0]):
-            if i + batch > df_tmp.shape[0]:
+            if i + batch_size > df_tmp.shape[0]:
                 break
-            X.append(df_tmp[i:i + batch])  # 当前取出需要分割为X，Y的批次数据
+            X.append(df_tmp[i:i + batch_size])  # 当前取出需要分割为X，Y的批次数据
 
         train_end_index = round(train_size * len(X))  # 训练集结束的位置
         return (X[:train_end_index], X[train_end_index:],)

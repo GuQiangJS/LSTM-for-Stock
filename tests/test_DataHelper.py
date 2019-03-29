@@ -22,27 +22,18 @@ def test_train_test_split_1():
         dic['close'].append(i)
         dic['v'].append(i)
     df = pd.DataFrame.from_dict(dic)
-    window = 5
-    days = 1
-    train_X, train_Y, test_X, test_Y = DataHelper.train_test_split(
-        df, train_size=1, window=window, days=days)
+    batch_size = 6
+    train, test = DataHelper.train_test_split(df, batch_size=batch_size, train_size=1)
     # logging.info(train_X)
     # logging.info(train_Y)
-    assert train_X is not None
-    assert train_Y is not None
-    assert test_X is not None
-    assert test_Y is not None
-    assert len(train_X) == 2
-    assert len(train_Y) == 2
-    assert len(test_X) == 0
-    assert len(test_Y) == 0
-    #判断内容是否正确
+    assert train is not None
+    assert test is not None
+    assert len(train) == 2
+    assert len(test) == 0
+    # 判断内容是否正确
     for i in range(2):
-        assert train_X[i].size == window
-        assert train_Y[i].size == days
-        assert arr_eq(train_X[i]['v'].values, arr(dic['v'][i:i + window]))
-        assert arr_eq(train_Y[i].values,
-                      arr(dic['close'][i + window:window + days + i]))
+        assert train[i].size == batch_size
+        assert arr_eq(train[i]['v'].values, arr(dic['v'][i:i + batch_size]))
 
 
 def test_train_test_split_2():
@@ -54,18 +45,15 @@ def test_train_test_split_2():
         dic['close'].append(i)
         dic['v'].append(i)
     df = pd.DataFrame.from_dict(dic)
-    train_X, train_Y, test_X, test_Y = DataHelper.train_test_split(
-        df, train_size=1, window=2, days=1)
+    batch_size = 3
+    train, test = DataHelper.train_test_split(
+        df, batch_size=batch_size, train_size=1)
     # logging.info(train_X)
     # logging.info(train_Y)
-    assert train_X is not None
-    assert train_Y is not None
-    assert test_X is not None
-    assert test_Y is not None
-    assert len(train_X) == 0
-    assert len(train_Y) == 0
-    assert len(test_X) == 0
-    assert len(test_Y) == 0
+    assert train is not None
+    assert test is not None
+    assert len(train) == 0
+    assert len(test) == 0
 
 
 def test_train_test_split_3():
@@ -83,26 +71,16 @@ def test_train_test_split_3():
         dic['close'].append(i)
         dic['v'].append(i)
     df = pd.DataFrame.from_dict(dic)
-    window = 5
-    days = 1
-    train_X, train_Y, test_X, test_Y = DataHelper.train_test_split(
-        df, train_size=1, window=window, days=days)
-    # logging.info(train_X)
-    # logging.info(train_Y)
-    assert train_X is not None
-    assert train_Y is not None
-    assert test_X is not None
-    assert test_Y is not None
-    assert len(train_X) == 6
-    assert len(train_Y) == 6
-    assert len(test_X) == 0
-    assert len(test_Y) == 0
+    batch_size = 6
+    train, test = DataHelper.train_test_split(
+        df, batch_size=batch_size, train_size=1)
+    assert train is not None
+    assert test is not None
+    assert len(train) == 6
+    assert len(test) == 0
     for i in range(6):
-        assert train_X[i].size == window
-        assert train_Y[i].size == days
-        assert arr_eq(train_X[i]['v'].values, arr(dic['v'][i:i + window]))
-        assert arr_eq(train_Y[i].values,
-                      arr(dic['close'][i + window:window + days + i]))
+        assert train[i].size == batch_size
+        assert arr_eq(train[i]['v'].values, arr(dic['v'][i:i + batch_size]))
 
 
 def test_train_test_split_4():
@@ -121,34 +99,19 @@ def test_train_test_split_4():
         dic['close'].append(i)
         dic['v'].append(i)
     df = pd.DataFrame.from_dict(dic)
-    window = 5
-    days = 1
-    train_X, train_Y, test_X, test_Y = DataHelper.train_test_split(
-        df, train_size=0.6, window=window, days=days)
-    # logging.info(train_X)
-    # logging.info(train_Y)
-    assert train_X is not None
-    assert train_Y is not None
-    assert test_X is not None
-    assert test_Y is not None
-    assert len(train_X) == 4
-    assert len(train_Y) == 4
-    assert len(test_X) == 2
-    assert len(test_Y) == 2
+    batch_size = 6
+    train, test = DataHelper.train_test_split(df, batch_size=batch_size, train_size=0.6)
+    assert train is not None
+    assert test is not None
+    assert len(train) == 4
+    assert len(test) == 2
     for i in range(6):
         if i + 1 <= 4:
-            assert train_X[i].size == window
-            assert train_Y[i].size == days
-            assert arr_eq(train_X[i]['v'].values, arr(dic['v'][i:i + window]))
-            assert arr_eq(train_Y[i].values,
-                          arr(dic['close'][i + window:window + days + i]))
+            assert train[i].size == batch_size
+            assert arr_eq(train[i]['v'].values, arr(dic['v'][i:i + batch_size]))
         else:
-            assert test_X[i - 4].size == window
-            assert test_Y[i - 4].size == days
-            assert arr_eq(test_X[i - 4]['v'].values,
-                          arr(dic['v'][i:i + window]))
-            assert arr_eq(test_Y[i - 4].values,
-                          arr(dic['close'][i + window:window + days + i]))
+            assert test[i - 4].size == batch_size
+            assert arr_eq(test[i - 4]['v'].values, arr(dic['v'][i:i + batch_size]))
 
 
 def test_train_test_split_5():
@@ -169,37 +132,24 @@ def test_train_test_split_5():
         dic['close'].append(i)
         dic['v'].append(i)
     df = pd.DataFrame.from_dict(dic)
-    window = 5
-    days = 1
-    train_X, train_Y, test_X, test_Y = DataHelper.train_test_split(
-        df, train_size=0.5, window=window, days=days)
+    batch_size = 6
+    train, test = DataHelper.train_test_split(df, batch_size=batch_size, train_size=0.5, )
     # logging.info(train_X)
     # logging.info(train_Y)
-    #总共12条数据，根据训练集0.6的比率，训练集为6条，测试集为6条
-    #训练集6条，window=5，days=1，刚好取一条train_X和train_Y
-    #训练集6条，window=5，days=1，刚好取一条test_X和test_Y
-    assert train_X is not None
-    assert train_Y is not None
-    assert test_X is not None
-    assert test_Y is not None
-    assert len(train_X) == 4
-    assert len(train_Y) == 4
-    assert len(test_X) == 4
-    assert len(test_Y) == 4
+    # 总共12条数据，根据训练集0.6的比率，训练集为6条，测试集为6条
+    # 训练集6条，window=5，days=1，刚好取一条train_X和train_Y
+    # 训练集6条，window=5，days=1，刚好取一条test_X和test_Y
+    assert train is not None
+    assert test is not None
+    assert len(train) == 4
+    assert len(test) == 4
     for i in range(6):
         if i + 1 <= 4:
-            assert train_X[i].size == window
-            assert train_Y[i].size == days
-            assert arr_eq(train_X[i]['v'].values, arr(dic['v'][i:i + window]))
-            assert arr_eq(train_Y[i].values,
-                          arr(dic['close'][i + window:window + days + i]))
+            assert train[i].size == batch_size
+            assert arr_eq(train[i]['v'].values, arr(dic['v'][i:i + batch_size]))
         else:
-            assert test_X[i - 4].size == window
-            assert test_Y[i - 4].size == days
-            assert arr_eq(test_X[i - 4]['v'].values,
-                          arr(dic['v'][i:i + window]))
-            assert arr_eq(test_Y[i - 4].values,
-                          arr(dic['close'][i + window:window + days + i]))
+            assert test[i - 4].size == batch_size
+            assert arr_eq(test[i - 4]['v'].values, arr(dic['v'][i:i + batch_size]))
 
 
 def test_train_test_split_6():
@@ -220,28 +170,17 @@ def test_train_test_split_6():
         dic['close'].append(i)
         dic['v'].append(i)
     df = pd.DataFrame.from_dict(dic)
-    window = 4
-    days = 2
-    train_X, train_Y, test_X, test_Y = DataHelper.train_test_split(
-        df, window=window, days=days)
-    assert len(train_X) == 7
-    assert len(train_Y) == 7
-    assert len(test_X) == 1
-    assert len(test_Y) == 1
+    batch_size = 6
+    train, test = DataHelper.train_test_split(df, batch_size=batch_size)
+    assert len(train) == 7
+    assert len(test) == 1
     for i in range(7):
         if i + 1 <= 7:
-            assert train_X[i].size == window
-            assert train_Y[i].size == days
-            assert arr_eq(train_X[i]['v'].values, arr(dic['v'][i:i + window]))
-            assert arr_eq(train_Y[i].values,
-                          arr(dic['close'][i + window:window + days + i]))
+            assert train[i].size == batch_size
+            assert arr_eq(train[i]['v'].values, arr(dic['v'][i:i + batch_size]))
         else:
-            assert test_X[i - 7].size == window
-            assert test_Y[i - 7].size == days
-            assert arr_eq(test_X[i - 7]['v'].values,
-                          arr(dic['v'][i:i + window]))
-            assert arr_eq(test_Y[i - 7].values,
-                          arr(dic['close'][i + window:window + days + i]))
+            assert test[i - 7].size == batch_size
+            assert arr_eq(test[i - 7]['v'].values, arr(dic['v'][i:i + batch_size]))
 
 
 def test_dataframe_series_to_array():
@@ -257,18 +196,16 @@ def test_dataframe_series_to_array():
         dic['Y'].append(i)
         dic['Z'].append(i)
     df = pd.DataFrame.from_dict(dic)
-    window = 5
-    days = 1
-    train_X, train_Y, test_X, test_Y = DataHelper.train_test_split(
-        df, train_size=1, window=window, days=days)
-    del test_X
-    del test_Y
-    for i in range(len(train_X)):
+    batch_size = 6
+    train, test = DataHelper.train_test_split(
+        df, batch_size=batch_size, train_size=1)
+    del test
+    for i in range(len(train)):
         logging.info('训练集 X DataFrame')
-        logging.info(train_X[i])
+        logging.info(train[i])
         logging.info('训练集 X numpy.ndarray')
-        logging.info(train_X[i].values)
+        logging.info(train[i].values)
         logging.info('训练集 Y DataFrame')
-        logging.info(train_Y[i])
+        logging.info(train[i])
         logging.info('训练集 Y numpy.ndarray')
-        logging.info(train_Y[i].values)
+        logging.info(train[i].values)
