@@ -1,5 +1,13 @@
 # 创建最新交易日报表
 
+import os
+import sys
+nb_dir = os.path.split(os.getcwd())[0]
+if nb_dir not in sys.path:
+    sys.path.append(nb_dir)
+if os.getcwd() not in sys.path:
+    sys.path.append(os.getcwd())
+
 from LSTM_for_Stock.data_processor import DataLoaderStock
 from app.train_all import wrapper
 from app.train_all import normalize

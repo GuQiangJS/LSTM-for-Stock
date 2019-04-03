@@ -183,7 +183,7 @@ if __name__ == "__main__":
     for code in lst:
         stock=QA.QA_fetch_stock_day_adv(code, start='1990-01-01', end='2019-03-31')
         if stock.date[0].date()<=index.date[0].date():
-            logging.info('{0}/{1}'.format(lst.index(code) + 1, len(lst)))
+            logging.info('{0}/{1}'.format(list(lst).index(code) + 1, len(lst)))
             # do(code,3,3)
             do(code,5,3)
             # do(code,10,3)
