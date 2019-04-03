@@ -132,6 +132,7 @@ for l in lst:
     result.append(start_code(l[0], int(l[1]), int(l[2])))
 
 web_path = os.path.join(root_dir, 'web')
+os.makedirs(web_path,exist_ok=True)
 PATH = os.path.dirname(os.path.abspath(__file__))
 file = os.path.join(web_path, "{0}.html".format(
     datetime.datetime.now().strftime('%Y%m%d%H%M%S')))

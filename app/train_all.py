@@ -68,6 +68,7 @@ class normalize(object):
 def save_model(m:keras.models.Model, p: str = None, *args, **kwargs):
     if p is None:
         p = os.path.join(nb_dir,'.train_result')
+    os.makedirs(p,exist_ok=True)
     window = kwargs.pop('window', None)
     days = kwargs.pop('days', None)
     stockcode = kwargs.pop('stockcode', None)
@@ -82,6 +83,7 @@ def save_model(m:keras.models.Model, p: str = None, *args, **kwargs):
 def save_history_img(history, p: str = None, *args, **kwargs):
     if p is None:
         p = os.path.join(nb_dir,'.train_result')
+    os.makedirs(p,exist_ok=True)
     window = kwargs.pop('window', None)
     days = kwargs.pop('days', None)
     benchmark = kwargs.pop('benchmark', None)
@@ -167,6 +169,11 @@ def do(code,window,days,*args,**kwargs):
     plt.plot(df_result['pred'])
     plt.plot(df_result['real'])
     plt.savefig(save_path, format="svg")
+    # RuntimeWarning: More than 20 figures have been opened. Figures created
+    # through the pyplot interface (`matplotlib.pyplot.figure`) are retained
+    # until explicitly closed and may consume too much memory. (To control
+    # this warning, see the rcParam `figure.max_open_warning`).
+    plt.close('all')
     # logging.info('pred result image:'+save_path)
     # logging.info('{0} - {1:02d} - {2:02d} Done.'.format(code,window,days))
     logging.info("".join(['-' for i in range(50)]))
