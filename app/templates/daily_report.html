@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"
+          crossorigin="anonymous">
+    <style>
+	body{background-color:#080808;}
+	h1,h2,h3,h4,h5,h6,h7{color:#ffb11b;}
+	.table thead th,.table th{color:#ffb11b;}
+	.table td{color:#fcfaf2}
+	table.dataTable tbody tr{background-color:transparent;}
+    .price,.percent{text-align: right}
+    </style>
+    <title>{{ title }}</title>
+</head>
+<body>
+<h1>{{ title }}</h1>
+<table class="table table-sm" id="dtBasicExample">
+    <thead>
+    <tr>
+        <th scope="col" rowspan="2">代码</th>
+        <th scope="col" rowspan="2">预测基准日期</th>
+        <th scope="col" rowspan="2">预测基准价格</th>
+        <th scope="col" rowspan="2">最后交易日期</th>
+        <th scope="col" rowspan="2">最后交易价格</th>
+        {% for i in range(result[0]['precents']|length) %}
+        <th scope="col" colspan="3">Day{{i+1}}</th>
+        {% endfor %}
+    </tr>
+    <tr>
+        {% for i in range(result[0]['precents']|length) %}
+        <th scope="col">变化率</th>
+        <th scope="col">预测值</th>
+        <th scope="col">差值</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    {% for item in result %}
+    <tr>
+        <th scope="row">{{item['code']}}</th>
+        <td>{{item['first_date']}}</td>
+        <td class="price">{{item['first_price']}}</td>
+        <td>{{item['last_date']}}</td>
+        <td class="price">{{item['last_price']}}</td>
+        {% for i in range(item['precents']|length) %}
+        <th scope="col" class="percent">{{item['precents'][i]}}</th>
+        <th scope="col" class="price">{{item['feature_price'][i]}}</th>
+        <th scope="col" class="price">{{item['feature_price'][i]-item['last_price']}}</th>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
+<script>
+	// Basic example
+	$(document).ready(function () {
+	$('#dtBasicExample').DataTable({
+	"searching":false,
+    "pageLength": 15,
+	"lengthChange":false
+	});
+	$('.dataTables_length').addClass('bs-select');
+	});
+    $(".price").each(function(){
+        this.innerText=numeral(this.innerText).format('0.0000')
+    })
+    $(".precent").each(function(){
+        this.innerText=numeral(this.innerText/100).format('0.00%')
+    })
+</script>
+</body>
+</html>

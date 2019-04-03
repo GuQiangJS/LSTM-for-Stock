@@ -1,3 +1,5 @@
+"""数据处理器"""
+
 import datetime
 import socket
 
@@ -8,10 +10,7 @@ import pandas as pd
 class Wrapper(object):
     """數據包裝器"""
 
-    def __init__(self, kwargs: dict = {}):
-        self.kwargs = kwargs
-
-    def build(self, df):
+    def build(self, df): #pylint: disable=C0103
         """數據處理
 
         Args:
@@ -61,7 +60,6 @@ class DataLoaderStock(DataLoader):
         online (bool, optional): Defaults to False. 是否獲取在線數據
         start (str, optional): Defaults to '1990-01-01'. 開始日期
         end (str, optional): Defaults to DataLoader.today(). 結束日期
-        
     """
 
     def __init__(self,
@@ -125,38 +123,46 @@ class DataLoaderStock(DataLoader):
 
     @property
     def data_raw(self) -> pd.DataFrame:
+        """原始数据"""
         if not self.loaded:
             self.load()
         return self.__data_raw
 
     @property
     def data(self) -> pd.DataFrame:
+        """处理后的数据"""
         if not self.loaded:
             self.load()
         return self.__data
 
     @property
     def stock_code(self) -> str:
+        """股票代码"""
         return self.__stock_code
 
     @property
     def benchmark_code(self) -> str:
+        """指数代码"""
         return self.__benchmark_code
 
     @property
     def start(self) -> str:
+        """数据开始日期"""
         return self.__start
 
     @property
     def end(self) -> str:
+        """数据结束日期"""
         return self.__end
 
     @property
     def online(self) -> bool:
+        """是否在线获取数据"""
         return self.__online
 
     @property
     def fq(self) -> str:
+        """复权处理"""
         return self.__fq
 
     def __fetch_stock_day(self) -> pd.DataFrame:
@@ -205,7 +211,7 @@ class DataLoaderStock(DataLoader):
             try:
                 d = QA.QAFetch.QATdx.QA_fetch_get_stock_day(
                     self.__stock_code, self.__start, self.__end)
-                # 原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'code', 'date', 'date_stamp']
+                # 原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'code', 'date', 'date_stamp'] pylint: disable=C0301
                 return d.rename(columns={'vol': 'volume'})[self._stock_columns]
             except socket.timeout:
                 if retries < times:
@@ -223,13 +229,39 @@ class DataLoaderStock(DataLoader):
             try:
                 d = QA.QAFetch.QATdx.QA_fetch_get_index_day(
                     self.__benchmark_code, self.__start, self.__end)
-                # 原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'up_count', 'down_count', 'date', 'code', 'date_stamp']
+                # 原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'up_count', 'down_count', 'date', 'code', 'date_stamp'] pylint: disable=C0301
                 return d.rename(columns={'vol': 'volume'})[self._index_columns]
             except socket.timeout:
                 if retries < times:
                     retries = retries + 1
                     continue
                 raise
+
+
+class Normalize(object):
+    """数据标准化器"""
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def build(self, df):
+        """执行数据标准化。**数据归一化**。
+
+        Args:
+            df (pd.DataFrame 或 pd.Series): 待处理的数据。
+
+        Returns:
+            pd.DataFrame 或 pd.Series: 与传入类型一致。
+        """
+        return df / df.iloc[0]
+
+
+class Normalize_Empty(Normalize):
+    """空白的数据标准化器"""
+
+    def build(self, df):
+        """执行数据标准化。返回原始数据。"""
+        return df
 
 
 class DataHelper(object):
@@ -277,3 +309,122 @@ class DataHelper(object):
 
         train_end_index = round(train_size * len(X))  # 训练集结束的位置
         return X[:train_end_index], X[train_end_index:]
+
+    @staticmethod
+    def xy_split_1(dfs, window, days, col_name='close', norm=Normalize()):
+        """拆分 `train_test_split` 返回的 `train` 和 `test` 结果。
+
+        Args:
+            dfs ([pd.DataFrame]): `train` 和 `test` 结果
+            norm: 数据构造器。实现了 `build` 方法的类均可。
+                如果为空则会自动为 `Normalize_Empty` 。
+                默认为 `Normalize`。
+            window (int): 窗口期
+            days (int): 结果期
+            col_name (str): 结果期取值的列名
+
+        Returns:
+            [[pd.DataFrame],[pd.Series]]: 按照 window,days 拆分后的集合。
+                X中包含所有列。Y中只包含 `col_name` 指定的列。
+                **Y 返回的结果是相对于返回集合的前一条数据做的`norm`处理。**
+
+        See Also:
+            * :py:func:`DataHelper.xy_split_2`
+
+        Examples:
+
+            >>> arr = [i for i in range(2, 8)]
+            >>> window = len(arr) - 2
+            >>> days = 2
+            >>> window, days
+            4, 2
+            >>> x, y = DataHelper.xy_split_1([pd.DataFrame(arr, columns=['c'])],
+            ...                              window, days, col_name='c')
+            >>> x
+            [      c
+                0  1.0
+                1  1.5
+                2  2.0
+                3  2.5]
+
+            y 的结果为 先取 [5, 6, 7] ，然后返回 [6/5.7/5]
+
+            >>> y
+            [4    1.2
+             5    1.4
+             Name: c, dtype: float64]
+            >>> type(x[0])
+            <class 'pandas.core.frame.DataFrame'>
+            >>> type(y[0])
+            <class 'pandas.core.series.Series'>
+
+        """
+        X = []
+        Y = []
+        if norm is None:
+            norm = Normalize_Empty()
+        for df in dfs:
+            df_tmp = df.copy()
+            X.append(norm.build(df_tmp)[:window])
+            Y.append(norm.build(df_tmp[-1 - days:])[col_name][1:1 + days])
+        return X, Y
+
+    @staticmethod
+    def xy_split_2(dfs, window, days, col_name='close', norm=Normalize()):
+        """拆分 `train_test_split` 返回的 `train` 和 `test` 结果。
+
+        Args:
+            dfs ([pd.DataFrame]): `train` 和 `test` 结果
+            norm: 数据构造器。实现了 `build` 方法的类均可。
+                如果为空则会自动为 `Normalize_Empty` 。
+                默认为 `Normalize`。
+            window (int): 窗口期
+            days (int): 结果期
+            col_name (str): 结果期取值的列名
+
+        Returns:
+            [[pd.DataFrame],[pd.Series]]: 按照 window,days 拆分后的集合。
+                X中包含所有列。Y中只包含 `col_name` 指定的列。
+                **Y 返回的结果是相对于返回集合的前一条数据做的`norm`处理。**
+
+        See Also:
+            * :py:func:`LSTM_for_Stock.DataHelper.xy_split_1`
+
+        Examples:
+
+            >>> arr = [i for i in range(2, 8)]
+            >>> window = len(arr) - 2
+            >>> days = 2
+            >>> window, days
+            4, 2
+            >>> x, y = DataHelper.xy_split_2([pd.DataFrame(arr, columns=['c'])],
+            ...                              window, days, col_name='c')
+            >>> x
+            [      c
+                0  1.0
+                1  1.5
+                2  2.0
+                3  2.5]
+
+            **与 :func:`~DataHelper.xy_split_1` 不同的是 对整个集合取一次 `norm` 操作。然后直接取值。
+            也就是 `y` 的值是相对于整个集合的第一条的。**
+
+            >>> y
+            [4    3.0
+            5    3.5
+            Name: c, dtype: float64]
+            >>> type(x[0])
+            <class 'pandas.core.frame.DataFrame'>
+            >>> type(y[0])
+            <class 'pandas.core.series.Series'>
+
+        """
+        X = []
+        Y = []
+        if norm is None:
+            norm = Normalize_Empty()
+        for df in dfs:
+            df_tmp = norm.build(df.copy())
+            X.append(df_tmp[:window])
+            Y.append(df_tmp[-1 - days:][col_name][1:1 + days])
+        return X, Y

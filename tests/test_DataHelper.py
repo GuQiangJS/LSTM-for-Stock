@@ -212,3 +212,30 @@ def test_dataframe_series_to_array():
         logging.info(train[i])
         logging.info('训练集 Y numpy.ndarray')
         logging.info(train[i].values)
+
+
+def test_xy_split_1():
+    arr = [i for i in range(2, 8)]
+    window = len(arr) - 2
+    days = 2
+    x, y = DataHelper.xy_split_1([pd.DataFrame(arr, columns=['c'])], window, days,
+                               col_name='c')
+    logging.info(arr)
+    logging.info(x)
+    logging.info(y)
+    logging.info(type(x[0]))
+    logging.info(type(y[0]))
+
+def test_xy_split_2():
+    arr = [i for i in range(2, 8)]
+    window = len(arr) - 2
+    days = 2
+    x, y = DataHelper.xy_split_2([pd.DataFrame(arr, columns=['c'])], window, days,
+                               col_name='c')
+    logging.info(arr)
+    logging.info(x)
+    logging.info(y)
+    logging.info(type(x[0]))
+    logging.info(type(y[0]))
+    s=pd.Series()
+    s.describe()

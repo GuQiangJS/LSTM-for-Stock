@@ -3,7 +3,10 @@ from keras.layers import Dense
 from keras.layers import Dropout
 from keras.layers import LSTM
 from keras.models import Sequential
+from keras.models import load_model
 from LSTM_for_Stock.unit import get_param_default_value as def_val
+import os
+from keras.backend import clear_session
 
 
 class Model(object):
@@ -13,7 +16,7 @@ class Model(object):
 class SequentialModel(Model):
     def __init__(self):
         self.__model = Sequential()
-        self.__history=None
+        self.__history = None
 
     @property
     def model(self):
@@ -168,3 +171,12 @@ class SequentialModel(Model):
             verbose=verbose,
             steps=steps,
             sample_weight=sample_weight)
+
+    def save(self, filepath):
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        self.model.save(filepath)
+
+    def load(self, filepath, clear=True):
+        if clear:
+            clear_session()
+        self.__model = load_model(filepath)
