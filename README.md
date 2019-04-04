@@ -6,6 +6,10 @@
 
 ### For Python3.5
 
+> 如果是 TensorFlow为仅支持 CPU 的版本的话，从第四步开始。
+>
+> TensorFlow GPU 版本的支持说明：[https://www.tensorflow.org/install/gpu]()
+
 1. 安装 CUDA
 
     [https://developer.nvidia.com/cuda-toolkit]()。可以通过这里 [https://developer.nvidia.com/cuda-toolkit-archive]() 选择需要的版本。我选的是 `9.0`。
@@ -14,6 +18,8 @@
 
     [https://developer.nvidia.com/rdp/cudnn-archive]()。根据第一步CUDA的版本选择对应的版本。之前选择了 `9.0` 所以这里选择 `Download cuDNN XXXX for CUDA 9.0`
     > 对于 `Windows2012R2` 版本来说选择 `cuDNN Library for Windows 7` 即可。
+    
+> 以上步骤安装完成后，对于Windows系统来说，还需要设置系统变量。参考 [https://www.tensorflow.org/install/gpu#windows_setup]()
 
 3. 安装  Microsoft Visual C++ 2015 Redistributable 更新 3 （Windows下安装TensorFlow的前置条件）[https://www.tensorflow.org/install/pip]()
 
