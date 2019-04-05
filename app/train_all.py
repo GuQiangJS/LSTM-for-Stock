@@ -145,10 +145,10 @@ def do(code, window, days, *args, **kwargs):
         {'units': 100, 'type': 'lstm', 'input_shape': X_train_arr[0].shape,
          'return_sequences': True},
         {'type': 'dropout', 'rate': 0.15},
-        {'units': 200, 'type': 'lstm', 'input_shape': X_train_arr[0].shape,
+        {'units': 200, 'type': 'lstm',
          'return_sequences': True},
         {'type': 'dropout', 'rate': 0.15},
-        {'units': 100, 'type': 'lstm', 'input_shape': X_train_arr[0].shape,
+        {'units': 100, 'type': 'lstm',
          'return_sequences': False},
         # {'units': 500, 'type': 'lstm', 'input_shape': X_train_arr[0].shape},
         {'units': days, 'type': 'dense'}]
@@ -170,6 +170,7 @@ def do(code, window, days, *args, **kwargs):
         train={
             'epochs': kwargs.pop("train_train_epochs", 1000),
             'verbose': kwargs.pop("train_verbose", 0),
+            'batch_size': kwargs.pop("batch_size", 128),
             'validation_split': kwargs.pop("train_valid_split", 0.15)
         })
     save_path = save_model(model.model, stockcode=code, window=window,
