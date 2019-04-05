@@ -126,3 +126,10 @@ def test_load():
     logging.info(df_fillna.shape)
     for col in df.columns:
         np.array_equal(df[col].values, df_fillna[col].values)
+
+# def test_111():
+#     import time
+#     import os
+#     import datetime
+#     f="C:/Users/GuQiang/Downloads/阿加莎--无人生还.mobi"
+#     time.localtime(os.stat(f).st_mtime)

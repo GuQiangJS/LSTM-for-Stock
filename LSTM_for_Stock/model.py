@@ -7,7 +7,7 @@ from keras.models import load_model
 from LSTM_for_Stock.unit import get_param_default_value as def_val
 import os
 from keras.backend import clear_session
-
+from keras.layers import CuDNNLSTM
 
 class Model(object):
     pass
@@ -56,6 +56,9 @@ class SequentialModel(Model):
             elif t == 'dropout':
                 # https://keras.io/zh/layers/recurrent/#Dropout
                 self.__model.add(Dropout.from_config(layer))
+            elif t == 'cudnnlstm':
+                # https://keras.io/zh/layers/recurrent/#Dropout
+                self.__model.add(CuDNNLSTM.from_config(layer))
 
         # https://keras.io/zh/models/model/#compile
         self.__model.compile(**compile)
