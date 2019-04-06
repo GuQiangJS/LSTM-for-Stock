@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="335fcf50-b8e1-4d84-8266-c06671bd4314" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/create_daily_report.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/create_daily_report.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/train_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/train_all.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -22,7 +20,7 @@
     <SUITE FILE_PATH="coverage/LSTM_for_Stock$create_daily_report.coverage" NAME="create_daily_report Coverage Results" MODIFIED="1554563220138" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
     <SUITE FILE_PATH="coverage/LSTM_for_Stock$pytest_in_tests.coverage" NAME="pytest in tests Coverage Results" MODIFIED="1553818691141" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/LSTM_for_Stock$Unittests_for_test_dataLoader_DataLoaderTestCase_test_init.coverage" NAME="Unittests for test_dataLoader.DataLoaderTestCase.test_init Coverage Results" MODIFIED="1552489875997" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
-    <SUITE FILE_PATH="coverage/LSTM_for_Stock$train_all.coverage" NAME="train_all Coverage Results" MODIFIED="1554430605719" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
+    <SUITE FILE_PATH="coverage/LSTM_for_Stock$train_all.coverage" NAME="train_all Coverage Results" MODIFIED="1554563758201" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
     <SUITE FILE_PATH="coverage/LSTM_for_Stock$pytest_for_test_DataLoaderStock_test_111.coverage" NAME="pytest for test_DataLoaderStock.test_111 Coverage Results" MODIFIED="1554430144483" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/LSTM_for_Stock$Unittests_for_test_unit_MyTestCase_test_something.coverage" NAME="Unittests for test_unit.MyTestCase.test_something Coverage Results" MODIFIED="1552525443452" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/LSTM_for_Stock$Unittests_for_test_model_MyTestCase_test_build_model.coverage" NAME="Unittests for test_model.MyTestCase.test_build_model Coverage Results" MODIFIED="1552529596356" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
@@ -60,24 +58,24 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="gitignore" value="14" />
-          <entry key="py" value="908" />
+          <entry key="py" value="1043" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="14" />
-          <entry key="Python" value="908" />
+          <entry key="Python" value="1043" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/train_all.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="610">
-              <caret line="189" column="31" selection-start-line="189" selection-start-column="31" selection-end-line="189" selection-end-column="31" />
+            <state relative-caret-position="373">
+              <caret line="197" column="6" selection-start-line="197" selection-start-column="6" selection-end-line="197" selection-end-column="6" />
             </state>
           </provider>
         </entry>
@@ -94,7 +92,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="516">
@@ -250,10 +248,10 @@
         <option value="$PROJECT_DIR$/LSTM_for_Stock/model.py" />
         <option value="$PROJECT_DIR$/LSTM_for_Stock/data_processor.py" />
         <option value="$PROJECT_DIR$/tests/test_DataLoaderStock.py" />
-        <option value="$PROJECT_DIR$/app/train_all.py" />
         <option value="$PROJECT_DIR$/tests/test_model.py" />
         <option value="$PROJECT_DIR$/app/create_daily_report.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/app/train_all.py" />
       </list>
     </option>
   </component>
@@ -263,7 +261,7 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="448" />
     <option name="y" value="166" />
     <option name="width" value="1370" />
@@ -343,7 +341,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.create_daily_report">
+  <component name="RunManager" selected="Python.train_all">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="LSTM-for-Stock" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -467,9 +465,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.train_all" />
         <item itemvalue="Python.create_daily_report" />
         <item itemvalue="Python tests.pytest for test_model.test_build_model" />
-        <item itemvalue="Python.train_all" />
         <item itemvalue="Python tests.pytest for test_DataLoaderStock.test_111" />
         <item itemvalue="Python tests.pytest for test_DataLoaderStock.test_load" />
       </list>
@@ -540,13 +538,13 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.676783" visible="true" weight="0.20309168" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.676783" visible="true" weight="0.20309168" />
       <window_info id="Structure" order="1" sideWeight="0.323217" side_tool="true" visible="true" weight="0.20309168" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3264642" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.31453362" />
-      <window_info anchor="bottom" id="Debug" order="3" visible="true" weight="0.28524947" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.28524947" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.329718" />
@@ -561,9 +559,9 @@
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="SciView" order="3" sideWeight="0.49468893" visible="true" weight="0.43869936" />
+      <window_info anchor="right" id="SciView" order="3" sideWeight="0.49468893" weight="0.43869936" />
       <window_info anchor="right" id="Database" order="4" />
-      <window_info anchor="right" x="0" y="0" width="434" height="856" id="Documentation" order="5" sideWeight="0.5053111" side_tool="true" visible="true" weight="0.43869936" />
+      <window_info anchor="right" x="0" y="0" width="434" height="856" id="Documentation" order="5" sideWeight="0.5053111" side_tool="true" visible="true" weight="0.28837952" />
       <window_info anchor="right" id="Coverage" order="6" side_tool="true" />
     </layout>
   </component>
@@ -608,8 +606,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/train_all.py</url>
-          <line>113</line>
-          <option name="timeStamp" value="55" />
+          <line>198</line>
+          <option name="timeStamp" value="59" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -748,6 +746,13 @@
       </expression>
       <expression>
         <expression-string>self._normalize.fit_transform([x[:, 0]])[0]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
+    <expressions id="setValue">
+      <expression>
+        <expression-string>'D:\\Github\\LSTM-for-Stock\\.train_result\\model_000001_05_03.h51'</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -938,6 +943,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1273">
           <caret line="71" column="40" selection-start-line="71" selection-start-column="40" selection-end-line="71" selection-end-column="40" />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1044,13 +1052,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/train_all.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="610">
-          <caret line="189" column="31" selection-start-line="189" selection-start-column="31" selection-end-line="189" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/finance35/Lib/site-packages/bson/json_util.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="415">
@@ -1079,6 +1080,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="516">
           <caret line="106" column="14" selection-start-line="106" selection-start-column="14" selection-end-line="106" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/train_all.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="373">
+          <caret line="197" column="6" selection-start-line="197" selection-start-column="6" selection-end-line="197" selection-end-column="6" />
         </state>
       </provider>
     </entry>

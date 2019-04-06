@@ -110,7 +110,7 @@ def save_history_img(history, p: str = None, *args, **kwargs):
 
 def do(code, window, days, *args, **kwargs):
     exists_file = _get_model_file_path(code, window, days,
-                             os.path.join(nb_dir, '.train_result'))
+                                       os.path.join(nb_dir, '.train_result'))
     if os.path.exists(exists_file):
         if (datetime.now() - datetime.fromtimestamp(
                 time.mktime(time.localtime(
@@ -164,13 +164,14 @@ def do(code, window, days, *args, **kwargs):
 
     model = SequentialModel()
     model.build_model(layers, complie)
+    batch_size = kwargs.pop("batch_size", 128)
     history = model.train(
         np.array(X_train_arr),
         np.array(Y_train_arr),
         train={
             'epochs': kwargs.pop("train_train_epochs", 1000),
             'verbose': kwargs.pop("train_verbose", 0),
-            'batch_size': kwargs.pop("batch_size", 128),
+            'batch_size': batch_size,
             'validation_split': kwargs.pop("train_valid_split", 0.15)
         })
     save_path = save_model(model.model, stockcode=code, window=window,
@@ -192,6 +193,9 @@ def do(code, window, days, *args, **kwargs):
                              'pred_{2}_{0:02d}_{1:02d}.svg'.format(window, days,
                                                                    code))
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    plt.title('{0} Window:{1}/Days:{2}/BatchSize:{3},Optimizer:{4}'.format(
+        code, window, days, batch_size, complie['optimizer']
+    ))
     plt.plot(df_result['pred'])
     plt.plot(df_result['real'])
     plt.savefig(save_path, format="svg")
