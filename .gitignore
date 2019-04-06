@@ -104,3 +104,4 @@ venv.bak/
 .mypy_cache/
 .train_result/
 web/
+.daily_result/

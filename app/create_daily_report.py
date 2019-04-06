@@ -7,7 +7,8 @@ if nb_dir not in sys.path:
     sys.path.append(nb_dir)
 if os.getcwd() not in sys.path:
     sys.path.append(os.getcwd())
-
+import json
+from bson import json_util
 from LSTM_for_Stock.data_processor import DataLoaderStock
 from app.train_all import wrapper
 from app.train_all import normalize
@@ -23,6 +24,7 @@ import datetime
 import logging
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
+import pandas as pd
 import gc
 
 root_dir = os.path.dirname(os.getcwd())
@@ -130,6 +132,22 @@ result = []
 for l in lst:
     logging.info('{0}/{1}'.format(lst.index(l) + 1, len(lst)))
     result.append(start_code(l[0], int(l[1]), int(l[2])))
+    if lst.index(l)==1:
+        break
+
+def default(o):
+    if isinstance(o, (datetime.date, datetime.datetime)):
+        return o.isoformat()
+    elif isinstance(o,float):
+        return str(o)
+
+result_path = os.path.join(root_dir, '.daily_result')
+os.makedirs(result_path,exist_ok=True)
+file = os.path.join(result_path, "{0}.json".format(
+    datetime.datetime.now().strftime('%Y%m%d%H%M%S')))
+with open(file,'w',encoding='utf-8') as f:
+    json.dump(result,f,indent=4, default=default)
+logging.info('Daily Result JSON Saved at:'+file)
 
 web_path = os.path.join(root_dir, 'web')
 os.makedirs(web_path,exist_ok=True)
@@ -145,4 +163,4 @@ with open(file, 'w', encoding='utf-8') as f:
     html = template.render(title=datetime.date.today().strftime("%Y-%m-%d"),
                            result=result)
     f.write(html)
-pass
+logging.info('Full WebPage Saved at:'+file)
