@@ -128,39 +128,62 @@ for f in os.listdir(model_path):
             window = g[1]
             days = g[2]
             lst.append([code, window, days])
-result = []
+result_full = []
+result_simple = []
 for l in lst:
     logging.info('{0}/{1}'.format(lst.index(l) + 1, len(lst)))
-    result.append(start_code(l[0], int(l[1]), int(l[2])))
-    if lst.index(l)==1:
-        break
+    rc=start_code(l[0], int(l[1]), int(l[2]))
+    result_full.append(rc)
+    for p in rc['precents']:
+        if p>1.1:
+            result_simple.append(rc)
+            break
 
-def default(o):
-    if isinstance(o, (datetime.date, datetime.datetime)):
-        return o.isoformat()
-    elif isinstance(o,float):
-        return str(o)
+def default(obj):
+    if isinstance(obj, datetime.date):
+        return {"$dt": obj.strftime("%Y-%m-%d")}
+    return json_util.default(obj)
+
+def _parse_date(doc):
+    dt = doc["$dt"]
+    return datetime.datetime.strptime(dt, "%Y-%m-%d").date()
+
+def hook(dct):
+    if "$dt" in dct:
+        return _parse_date(dct)
+    return json_util.object_hook(dct)
 
 result_path = os.path.join(root_dir, '.daily_result')
 os.makedirs(result_path,exist_ok=True)
 file = os.path.join(result_path, "{0}.json".format(
     datetime.datetime.now().strftime('%Y%m%d%H%M%S')))
 with open(file,'w',encoding='utf-8') as f:
-    json.dump(result,f,indent=4, default=default)
+    str=json.dumps(result_full,sort_keys=True,indent=1, default=default)
+    file.write(str)
 logging.info('Daily Result JSON Saved at:'+file)
 
 web_path = os.path.join(root_dir, 'web')
 os.makedirs(web_path,exist_ok=True)
 PATH = os.path.dirname(os.path.abspath(__file__))
-file = os.path.join(web_path, "{0}.html".format(
-    datetime.datetime.now().strftime('%Y%m%d%H%M%S')))
 TEMPLATE_ENVIRONMENT = Environment(
     autoescape=False,
     loader=FileSystemLoader(os.path.join(PATH, 'templates')),
     trim_blocks=False)
 template = TEMPLATE_ENVIRONMENT.get_template('daily_report.html')
+
+file = os.path.join(web_path,"{0}_full.html".format(
+    datetime.datetime.now().strftime('%Y%m%d%H%M%S')))
 with open(file, 'w', encoding='utf-8') as f:
     html = template.render(title=datetime.date.today().strftime("%Y-%m-%d"),
-                           result=result)
+                           result=result_full)
+    f.write(html)
+logging.info('Full WebPage Saved at:'+file)
+
+
+file = os.path.join(web_path,"{0}_simple.html".format(
+    datetime.datetime.now().strftime('%Y%m%d%H%M%S')))
+with open(file, 'w', encoding='utf-8') as f:
+    html = template.render(title=datetime.date.today().strftime("%Y-%m-%d"),
+                           result=result_simple)
     f.write(html)
 logging.info('Full WebPage Saved at:'+file)

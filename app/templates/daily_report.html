@@ -69,22 +69,6 @@
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"
         crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
-<script>
-	// Basic example
-	$(document).ready(function () {
-	$('#dtBasicExample').DataTable({
-	"searching":false,
-    "pageLength": 15,
-	"lengthChange":false
-	});
-	$('.dataTables_length').addClass('bs-select');
-	});
-    $(".price").each(function(){
-        this.innerText=numeral(this.innerText).format('0.0000')
-    })
-    $(".percent").each(function(){
-        this.innerText=numeral(this.innerText/100).format('0.00%')
-    })
-</script>
+<script src="n.js"></script>
 </body>
 </html>
