@@ -23,7 +23,7 @@ import time
 import numpy as np
 from sklearn.model_selection import cross_val_score  # K折交叉验证模块
 import matplotlib
-
+from LSTM_for_Stock.loss import root_mean_squared_error
 matplotlib.rcParams["figure.figsize"] = [16, 5]
 matplotlib.rcParams['font.family'] = 'sans-serif'
 matplotlib.rcParams['font.sans-serif'] = ['Noto Sans CJK SC', 'SimHei']
@@ -129,6 +129,14 @@ class wrapper_CCI(Wrapper):
         # result['WMA_20'] = indicators.talib_WMA(result, N=20)
         # result['WMA_30'] = indicators.talib_WMA(result, N=30)
 
+        # https://www.kaggle.com/kratisaxena/lstm-gru-models-for-stock-movement-analysis
+        # result['RSI_5'] = QA.QA_indicator_RSI(result, 5, 5, 5)['RSI1']
+        # result['MOM_5'] = indicators.talib_MOM(result, 5)
+        # result[[
+        #     'BB_SMA_LOWER_5', 'BB_SMA_MIDDLE_5', 'BB_SMA_UPPER_5']] = indicators.talib_BBANDS(
+        #     result, 5)
+        # result[['AROON_DOWN_5','AROON_UP_5']] = QA.talib_indicators.AROON(result, 5)
+
         return result.dropna()
 
 
@@ -208,19 +216,31 @@ def do(code='000002', window=5, days=3, wrapper=wrapper(), norm=normalize(),
 
     clear_session()
     model = Sequential()
+    # https://www.researchgate.net/publication/327967988_Predicting_Stock_Prices_Using_LSTM
+    # For analyzing the efficiency of the system  we are used  the
+    # Root Mean Square Error(RMSE). The error or the difference between
+    # the  target  and  the  obtained  output  value  is minimized by
+    # using RMSE value. RMSE is the square root of the mean/average of the
+    # square of all of the error. The use of  RMSE  is  highly  common  and
+    # it  makes  an  excellent general  purpose  error  metric  for
+    # numerical  predictions. Compared  to  the  similar  Mean  Absolute  Error,
+    # RMSE amplifies and severely punishes large errors.
     model.add(
         LSTM(128, input_shape=X_train_arr[0].shape, return_sequences=True))
-    model.add(Dropout(0.1))
-    # model.add(LSTM(256, return_sequences=True))
+    # model.add(Dropout(0.1))
+    model.add(
+        LSTM(64, input_shape=X_train_arr[0].shape, return_sequences=False))
+    model.add(Dense(16, activation='relu'))
+    model.add(Dense(days, activation='linear'))
     # model.add(Dropout(0.2))
-    # model.add(LSTM(128, return_sequences=True))
+    # model.add(LSTM(16, return_sequences=True))
     # model.add(Dropout(0.2))
     # model.add(LSTM(64, return_sequences=True))
-    model.add(Dropout(0.1))
-    model.add(LSTM(128))
-    model.add(Dropout(0.2))
-    model.add(Dense(days))
-    model.compile(loss='mse',
+    # model.add(Dropout(0.1))
+    # model.add(LSTM(128))
+    # model.add(Dropout(0.2))
+    # model.add(Dense(days))
+    model.compile(loss=root_mean_squared_error,
                   optimizer="rmsprop",
                   metrics=["mae", "acc"])
     start = time.time()
@@ -241,7 +261,6 @@ def do(code='000002', window=5, days=3, wrapper=wrapper(), norm=normalize(),
             'Y_test_arr': Y_test_arr, 'model': model, 'code': code,
             'window': window, 'days': days, 'batch_size': batch_size,
             'history': history}
-
 
 def show_history(h):
     start = h['start']

@@ -18,29 +18,52 @@ def talib_KAMA(DataFrame, N=30):
     res = talib.KAMA(DataFrame.close.values, timeperiod=N)
     return pd.DataFrame({'KAMA': res}, index=DataFrame.index)
 
+
 def talib_MIDPOINT(DataFrame, N=14):
     res = talib.MIDPOINT(DataFrame.close.values, timeperiod=N)
     return pd.DataFrame({'MIDPOINT': res}, index=DataFrame.index)
 
+
 def talib_MIDPRICE(DataFrame, N=14):
-    res = talib.MIDPRICE(DataFrame.high.values, DataFrame.low.values, timeperiod=N)
+    res = talib.MIDPRICE(DataFrame.high.values, DataFrame.low.values,
+                         timeperiod=N)
     return pd.DataFrame({'MIDPRICE': res}, index=DataFrame.index)
 
+
 def talib_T3(DataFrame, N=5, vfactor=0):
-    res = talib.T3(DataFrame.close.values, timeperiod=N,vfactor=vfactor)
+    res = talib.T3(DataFrame.close.values, timeperiod=N, vfactor=vfactor)
     return pd.DataFrame({'T3': res}, index=DataFrame.index)
+
 
 def talib_TEMA(DataFrame, N=30):
     res = talib.TEMA(DataFrame.close.values, timeperiod=N)
     return pd.DataFrame({'TEMA': res}, index=DataFrame.index)
 
+
 def talib_TRIMA(DataFrame, N=30):
     res = talib.TRIMA(DataFrame.close.values, timeperiod=N)
     return pd.DataFrame({'TRIMA': res}, index=DataFrame.index)
 
+
 def talib_WMA(DataFrame, N=30):
     res = talib.WMA(DataFrame.close.values, timeperiod=N)
     return pd.DataFrame({'WMA': res}, index=DataFrame.index)
+
+
+def talib_MOM(DataFrame, N=10):
+    res = talib.MOM(DataFrame.close.values, timeperiod=N)
+    return pd.DataFrame({'MOM': res}, index=DataFrame.index)
+
+
+def talib_BBANDS(DataFrame, N=5, nbdevup=2, nbdevdn=2, matype=0):
+    upperband, middleband, lowerband = talib.BBANDS(DataFrame.close.values,
+                                                    timeperiod=N,
+                                                    nbdevup=nbdevup,
+                                                    nbdevdn=nbdevdn,
+                                                    matype=matype)
+    return pd.DataFrame(
+        {'UPPER': upperband, 'MIDDLE': middleband, 'LOWER': lowerband},
+        index=DataFrame.index)
 
 
 def talib_AVGPRICE(DataFrame):
