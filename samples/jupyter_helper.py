@@ -284,9 +284,9 @@ def show_history(h,*args,**kwargs):
         for i in range(len(model.metrics_names)):
             print('{0}:{1}'.format(model.metrics_names[i], score[i]))
 
-    plt=kwargs.pop('plt',True)
+    show_plt=kwargs.pop('show_plt',True)
 
-    if plt:
+    if show_plt:
         plt.figure(figsize=(15, 8))
 
         # 绘制训练 & 验证的准确率值
@@ -314,7 +314,7 @@ def show_history(h,*args,**kwargs):
         df_result = pd.DataFrame(
             {'pred': pred[:, day], 'real': np.array(Y_test_arr)[:, day]})
 
-        if plt:
+        if show_plt:
             plt.figure(figsize=(15, 8))
             plt.title(
                 '预测。code={0},window={1},day={2}/{3},batch_size={4}'.format(code,
