@@ -255,14 +255,15 @@ def do(code='000002', window=5, days=3, wrapper=wrapper(), norm=normalize(),
         callbacks=[EarlyStopping(monitor="loss", patience=10, verbose=verbose,
                                  mode="auto")]
     )
-    model.summary()
+    if kwargs.pop('summary',True):
+        model.summary()
     end = time.time()
     return {'start': start, 'end': end, 'X_test_arr': X_test_arr,
             'Y_test_arr': Y_test_arr, 'model': model, 'code': code,
             'window': window, 'days': days, 'batch_size': batch_size,
             'history': history}
 
-def show_history(h):
+def show_history(h,*args,**kwargs):
     start = h['start']
     end = h['end']
     X_test_arr = h['X_test_arr']
@@ -278,30 +279,34 @@ def show_history(h):
 
     score = model.evaluate(np.array(X_test_arr), np.array(Y_test_arr))
 
-    print("Score:")
-    for i in range(len(model.metrics_names)):
-        print('{0}:{1}'.format(model.metrics_names[i], score[i]))
+    if kwargs.pop('print_score',True):
+        print("Score:")
+        for i in range(len(model.metrics_names)):
+            print('{0}:{1}'.format(model.metrics_names[i], score[i]))
 
-    plt.figure(figsize=(15, 8))
+    plt=kwargs.pop('plt',True)
 
-    # 绘制训练 & 验证的准确率值
-    plt.plot(history.history['acc'])
-    plt.plot(history.history['val_acc'])
-    plt.title('Model accuracy')
-    plt.ylabel('Accuracy')
-    plt.xlabel('Epoch')
-    plt.legend(['Train', 'Test'], loc='upper left')
-    plt.show()
+    if plt:
+        plt.figure(figsize=(15, 8))
 
-    plt.figure(figsize=(15, 8))
-    # 绘制训练 & 验证的损失值
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title('Model loss')
-    plt.ylabel('Loss')
-    plt.xlabel('Epoch')
-    plt.legend(['Train', 'Test'], loc='upper left')
-    plt.show()
+        # 绘制训练 & 验证的准确率值
+        plt.plot(history.history['acc'])
+        plt.plot(history.history['val_acc'])
+        plt.title('Model accuracy')
+        plt.ylabel('Accuracy')
+        plt.xlabel('Epoch')
+        plt.legend(['Train', 'Test'], loc='upper left')
+        plt.show()
+
+        plt.figure(figsize=(15, 8))
+        # 绘制训练 & 验证的损失值
+        plt.plot(history.history['loss'])
+        plt.plot(history.history['val_loss'])
+        plt.title('Model loss')
+        plt.ylabel('Loss')
+        plt.xlabel('Epoch')
+        plt.legend(['Train', 'Test'], loc='upper left')
+        plt.show()
 
     pred = model.predict(np.array(X_test_arr))
     pred_slope = []
@@ -309,19 +314,20 @@ def show_history(h):
         df_result = pd.DataFrame(
             {'pred': pred[:, day], 'real': np.array(Y_test_arr)[:, day]})
 
-        plt.figure(figsize=(15, 8))
-        plt.title(
-            '预测。code={0},window={1},day={2}/{3},batch_size={4}'.format(code,
-                                                                       window,
-                                                                       day + 1,
-                                                                       days,
-                                                                       batch_size))
-        plt.plot(df_result['pred'])
-        plt.plot(df_result['real'])
-        plt.show()
+        if plt:
+            plt.figure(figsize=(15, 8))
+            plt.title(
+                '预测。code={0},window={1},day={2}/{3},batch_size={4}'.format(code,
+                                                                        window,
+                                                                        day + 1,
+                                                                        days,
+                                                                        batch_size))
+            plt.plot(df_result['pred'])
+            plt.plot(df_result['real'])
+            plt.show()
 
-        sns.regplot(x=pred[:, day], y=np.array(Y_test_arr)[:, day])
-        plt.show()
+            sns.regplot(x=pred[:, day], y=np.array(Y_test_arr)[:, day])
+            plt.show()
         slope = stats.linregress(pred[:, day],
                                  np.array(Y_test_arr)[:, day]).slope
         print('Slope Day{0}:{1}'.format(day + 1, slope))
