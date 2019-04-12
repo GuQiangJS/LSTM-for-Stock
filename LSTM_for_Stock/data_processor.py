@@ -8,6 +8,8 @@ import pandas as pd
 from sklearn.preprocessing import normalize
 import logging
 from QUANTAXIS.QAUtil import QA_util_datetime_to_strdate as datetostr
+from QUANTAXIS.QAFetch.QAQuery import QA_fetch_stock_to_market_date
+from QUANTAXIS.QAFetch.QAQuery_Advance import QA_fetch_stock_block_adv
 
 
 class Wrapper(object):
@@ -348,7 +350,7 @@ class Normalize_append_features(object):
         for col in tmp.columns:
             tmp[col + '_N1'] = normalize([tmp[col]])[0]
             tmp[col + '_N2'] = tmp[col] / tmp.iloc[0][col]
-            tmp[col + '_N3'] = tmp[col].pct_change()
+            tmp[col + '_N3'] = tmp[col].pct_change().fillna(0)
             # if col in ['CCI_5', 'RSI_5','AROON_UP_5','AROON_DOWN_5']:
             #     tmp[col] = sklearn.preprocessing.normalize([tmp[col]])[0]
             # elif col in ['MOM_5']:
@@ -521,3 +523,44 @@ class DataHelper(object):
             X.append(df_tmp[:window])
             Y.append(df_tmp[-1 - days:][col_name][1:1 + days])
         return X, Y
+
+
+def get_ipo_date(code):
+    """获取上市日期
+
+    Args:
+        code (str): 股票代码
+
+    Returns:
+        datetime: 如果获取失败或者有异常会返回None
+    """
+    result = _get_tdx_ipo_date(code)
+    if not result:
+        result = _get_tushare_ipo_date(code)
+    return result
+
+
+def _get_tushare_ipo_date(code):
+    try:
+        return datetime.datetime.strptime(QA_fetch_stock_to_market_date(code),
+                                          '%Y-%m-%d')
+    except:
+        return None
+
+
+def _get_tdx_ipo_date(code):
+    try:
+        info = QA.QA_fetch_stock_info(code)
+        if not info.empty:
+            return datetime.datetime.strptime(str(info.loc[code]['ipo_date']),
+                                              '%Y%m%d')
+    except:
+        return None
+
+
+def get_block_code(code, type='zjhhy') -> (str):
+    """按照证监会行业分类，获取指定股票的同分类所有股票代码"""
+    df = QA_fetch_stock_block_adv()
+    k = df.get_code(code).data
+    name = k[k['type'] == type].reset_index()['blockname'].values[0]
+    return [c for c in df.get_block(name).code if c != code]
