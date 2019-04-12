@@ -74,8 +74,9 @@ class Wrapper_append_features(Wrapper):
             'BB_SMA_LOWER_5', 'BB_SMA_MIDDLE_5',
             'BB_SMA_UPPER_5']] = indicators.talib_BBANDS(
             result, 5)
-        result[['AROON_DOWN_5', 'AROON_UP_5']] = QA.talib_indicators.AROON(
-            result, 5)
+        # result[['AROON_DOWN_5', 'AROON_UP_5']] = QA.talib_indicators.AROON(
+        #     result, 5)
+        # result['AROONOSC_5'] = QA.talib_indicators.AROONOSC(result,5)
 
         return result.dropna()
 
@@ -331,32 +332,32 @@ class Normalize_Empty(Normalize):
         return df
 
 
-class Normalize_append_features(object):
-    """数据标准化器"""
-
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def build(self, df):
-        """执行数据标准化。**数据归一化**。
-
-        Args:
-            df (pd.DataFrame 或 pd.Series): 待处理的数据。
-
-        Returns:
-            pd.DataFrame 或 pd.Series: 与传入类型一致。
-        """
-        tmp = df.copy()
-        for col in tmp.columns:
-            tmp[col + '_N1'] = normalize([tmp[col]])[0]
-            tmp[col + '_N2'] = tmp[col] / tmp.iloc[0][col]
-            tmp[col + '_N3'] = tmp[col].pct_change().fillna(0)
-            # if col in ['CCI_5', 'RSI_5','AROON_UP_5','AROON_DOWN_5']:
-            #     tmp[col] = sklearn.preprocessing.normalize([tmp[col]])[0]
-            # elif col in ['MOM_5']:
-            #     continue
-            # tmp[col] = tmp[col] / tmp.iloc[0][col]
-        return tmp
+# class Normalize_append_features(object):
+#     """数据标准化器"""
+#
+#     def __init__(self, *args, **kwargs):
+#         pass
+#
+#     def build(self, df):
+#         """执行数据标准化。**数据归一化**。
+#
+#         Args:
+#             df (pd.DataFrame 或 pd.Series): 待处理的数据。
+#
+#         Returns:
+#             pd.DataFrame 或 pd.Series: 与传入类型一致。
+#         """
+#         tmp = df.copy()
+#         for col in tmp.columns:
+#             tmp[col] = normalize([tmp[col]])[0]
+#             tmp[col + '_N1'] = tmp[col] / tmp.iloc[0][col]
+#             # tmp[col + '_N3'] = tmp[col].pct_change().fillna(0)
+#             # if col in ['CCI_5', 'RSI_5','AROON_UP_5','AROON_DOWN_5']:
+#             #     tmp[col] = sklearn.preprocessing.normalize([tmp[col]])[0]
+#             # elif col in ['MOM_5']:
+#             #     continue
+#             # tmp[col] = tmp[col] / tmp.iloc[0][col]
+#         return tmp
 
 
 class DataHelper(object):

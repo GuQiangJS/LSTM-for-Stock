@@ -75,18 +75,9 @@ def do(code='000002', window=5, days=3, wrapper=Wrapper_default(),
     model.add(
         LSTM(128, input_shape=X_train_arr[0].shape, return_sequences=True))
     # model.add(Dropout(0.1))
-    model.add(
-        LSTM(64, input_shape=X_train_arr[0].shape, return_sequences=False))
+    model.add(LSTM(64, return_sequences=False))
     model.add(Dense(16, activation='relu'))
     model.add(Dense(days, activation='linear'))
-    # model.add(Dropout(0.2))
-    # model.add(LSTM(16, return_sequences=True))
-    # model.add(Dropout(0.2))
-    # model.add(LSTM(64, return_sequences=True))
-    # model.add(Dropout(0.1))
-    # model.add(LSTM(128))
-    # model.add(Dropout(0.2))
-    # model.add(Dense(days))
     model.compile(loss=root_mean_squared_error,
                   optimizer="rmsprop",
                   metrics=["mae", "acc"])
@@ -108,7 +99,8 @@ def do(code='000002', window=5, days=3, wrapper=Wrapper_default(),
     return {'start': start, 'end': end, 'X_test_arr': X_test_arr,
             'Y_test_arr': Y_test_arr, 'model': model, 'code': code,
             'window': window, 'days': days, 'batch_size': batch_size,
-            'history': history}
+            'history': history, 'data': df, 'X_train': X_train,
+            'Y_train': Y_train, 'X_test': X_test, 'Y_test': Y_test}
 
 
 def show_history(h, *args, **kwargs):
@@ -130,7 +122,7 @@ def show_history(h, *args, **kwargs):
     if kwargs.pop('print_score', True):
         print("Score:")
         for i in range(len(model.metrics_names)):
-            print('{0}:{1}'.format(model.metrics_names[i], score[i]))
+            print(' {0}:{1}'.format(model.metrics_names[i], score[i]))
 
     show_plt = kwargs.pop('show_plt', True)
 
