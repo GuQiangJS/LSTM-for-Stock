@@ -2,9 +2,14 @@
 
 import datetime
 import socket
-
+from LSTM_for_Stock import indicators
 import QUANTAXIS as QA
 import pandas as pd
+from sklearn.preprocessing import normalize
+import logging
+from QUANTAXIS.QAUtil import QA_util_datetime_to_strdate as datetostr
+from QUANTAXIS.QAFetch.QAQuery import QA_fetch_stock_to_market_date
+from QUANTAXIS.QAFetch.QAQuery_Advance import QA_fetch_stock_block_adv
 
 
 class Wrapper(object):
@@ -39,6 +44,43 @@ class Wrapper_fillna(Wrapper):
         return result.dropna()
 
 
+class Wrapper_default(Wrapper):
+    def build(self, df):
+        result = df.copy()
+        result = result.fillna(method='ffill')
+        result = result.drop(columns=['up_count', 'down_count'])
+        return result.dropna()
+
+
+class Wrapper_remove_benchmark(Wrapper_default):
+    def build(self, df):
+        result = super(Wrapper_remove_benchmark, self).build(df)
+        result = result.drop(
+            columns=[f for f in result.columns if 'bench' in f])
+        return result.dropna()
+
+
+class Wrapper_append_features(Wrapper):
+    def build(self, df):
+        result = df.copy()
+        result = result.fillna(method='ffill')
+        result = result.drop(columns=['up_count', 'down_count'])
+
+        result['EMA_5'] = QA.QA_indicator_EMA(result, 5)
+        result['CCI_5'] = QA.talib_indicators.CCI(result, 5)
+        result['RSI_5'] = QA.QA_indicator_RSI(result, 5, 5, 5)['RSI1']
+        result['MOM_5'] = indicators.talib_MOM(result, 5)
+        result[[
+            'BB_SMA_LOWER_5', 'BB_SMA_MIDDLE_5',
+            'BB_SMA_UPPER_5']] = indicators.talib_BBANDS(
+            result, 5)
+        # result[['AROON_DOWN_5', 'AROON_UP_5']] = QA.talib_indicators.AROON(
+        #     result, 5)
+        # result['AROONOSC_5'] = QA.talib_indicators.AROONOSC(result,5)
+
+        return result.dropna()
+
+
 class DataLoader(object):
     """數據提供器"""
 
@@ -69,7 +111,8 @@ class DataLoaderStock(DataLoader):
                  online=False,
                  start='1990-01-01',
                  end=DataLoader.today(),
-                 wrapper=Wrapper()):
+                 wrapper=Wrapper(),
+                 *args, **kwargs):
         """股票數據提供器
         
         Args:
@@ -83,6 +126,7 @@ class DataLoaderStock(DataLoader):
             start (str, optional): Defaults to '1990-01-01'. 開始日期
             end (str, optional): Defaults to DataLoader.today(). 結束日期
             wrapper (Wrapper, optional): Defaults to Wrapper(). `DataFrame`包装器。
+            appends (str): 待附加的股票代码列表。默认为空。
         """
         self.__stock_code = stock_code
         self.__benchmark_code = benchmark_code
@@ -94,6 +138,7 @@ class DataLoaderStock(DataLoader):
         self.__data_raw = pd.DataFrame()
         self.__data = pd.DataFrame()
         self.__loaded = False
+        self.__appends = kwargs.pop('appends', [])
 
     def load(self) -> pd.DataFrame:
         """读取数据。拼接 stock 和 benchmark 的数据。
@@ -104,17 +149,33 @@ class DataLoaderStock(DataLoader):
             pd.DataFrame: 合并后的数据。返回的数据与 `self.data` 一致。
         """
         if self.__online:
-            stock_df = self.__fetch_stock_day_online()
             bench_df = self.__fetch_index_day_online()
         else:
-            stock_df = self.__fetch_stock_day()
             bench_df = self.__fetch_index_day()
-        self.__data_raw = bench_df.join(stock_df, lsuffix='_bench')
+        stock_df = self.__fetch_stock_day_core(self.__stock_code)
+        self.__data_raw = stock_df.join(bench_df, rsuffix='_bench')
+        for c in self.__appends:
+            code_df = self.__fetch_stock_day_core(c,
+                                                  start=datetostr(
+                                                      bench_df.index[0]))
+            if not code_df.empty:
+                self.__data_raw = self.__data_raw.join(code_df, rsuffix='_' + c)
+
         self.__data = self.__data_raw.copy()
         if self.__wrapper:
             self.__data = self.__wrapper.build(self.__data)
         self.__loaded = True
         return self.__data
+
+    def __fetch_stock_day_core(self, code: str, start=None, end=None):
+        if not start:
+            start = self.__start
+        if not end:
+            end = self.__end
+        if self.__online:
+            return self.__fetch_stock_day_online(code)
+        else:
+            return self.__fetch_stock_day(code, start, end)
 
     @property
     def loaded(self) -> bool:
@@ -165,12 +226,13 @@ class DataLoaderStock(DataLoader):
         """复权处理"""
         return self.__fq
 
-    def __fetch_stock_day(self) -> pd.DataFrame:
+    def __fetch_stock_day(self, code, start, end) -> pd.DataFrame:
         """獲取本地的股票日線數據。會丟棄 `code` 列，并根據 `self.__fq` 來確定是否取復權數據。
         返回列名：_stock_columns
         """
-        d = QA.QA_fetch_stock_day_adv(
-            self.__stock_code, start=self.__start, end=self.__end)
+        d = QA.QA_fetch_stock_day_adv(code, start=start, end=end)
+        if not d:
+            return pd.DataFrame()
         if self.__fq == 'qfq':
             df = d.to_qfq()
         elif self.__fq == 'hfq':
@@ -203,7 +265,8 @@ class DataLoaderStock(DataLoader):
     def _stock_columns(self) -> [str]:
         return ['open', 'high', 'low', 'close', 'volume', 'amount']
 
-    def __fetch_stock_day_online(self, times=5) -> pd.DataFrame:
+    def __fetch_stock_day_online(self, code, start, end,
+                                 times=5) -> pd.DataFrame:
         """讀取股票在線日線數據。
             times (int, optional): Defaults to 5. 重試次數
         返回列名：_stock_columns。
@@ -211,9 +274,9 @@ class DataLoaderStock(DataLoader):
         retries = 0
         while True:
             try:
-                df = QA.QAFetch.QATdx.QA_fetch_get_stock_day(self.__stock_code,
-                                                             self.__start,
-                                                             self.__end)
+                df = QA.QAFetch.QATdx.QA_fetch_get_stock_day(code,
+                                                             start,
+                                                             end)
                 # df = df.astype('float32')
                 # 原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'code', 'date', 'date_stamp'] pylint: disable=C0301
                 return df.rename(columns={'vol': 'volume'})[self._stock_columns]
@@ -267,6 +330,34 @@ class Normalize_Empty(Normalize):
     def build(self, df):
         """执行数据标准化。返回原始数据。"""
         return df
+
+
+# class Normalize_append_features(object):
+#     """数据标准化器"""
+#
+#     def __init__(self, *args, **kwargs):
+#         pass
+#
+#     def build(self, df):
+#         """执行数据标准化。**数据归一化**。
+#
+#         Args:
+#             df (pd.DataFrame 或 pd.Series): 待处理的数据。
+#
+#         Returns:
+#             pd.DataFrame 或 pd.Series: 与传入类型一致。
+#         """
+#         tmp = df.copy()
+#         for col in tmp.columns:
+#             tmp[col] = normalize([tmp[col]])[0]
+#             tmp[col + '_N1'] = tmp[col] / tmp.iloc[0][col]
+#             # tmp[col + '_N3'] = tmp[col].pct_change().fillna(0)
+#             # if col in ['CCI_5', 'RSI_5','AROON_UP_5','AROON_DOWN_5']:
+#             #     tmp[col] = sklearn.preprocessing.normalize([tmp[col]])[0]
+#             # elif col in ['MOM_5']:
+#             #     continue
+#             # tmp[col] = tmp[col] / tmp.iloc[0][col]
+#         return tmp
 
 
 class DataHelper(object):
@@ -367,7 +458,7 @@ class DataHelper(object):
         X = []
         Y = []
         if norm is None:
-            norm = Normalize_Empty()
+            norm = Normalize()
         for df in dfs:
             df_tmp = df.copy()
             X.append(norm.build(df_tmp)[:window])
@@ -427,9 +518,50 @@ class DataHelper(object):
         X = []
         Y = []
         if norm is None:
-            norm = Normalize_Empty()
+            norm = Normalize()
         for df in dfs:
             df_tmp = norm.build(df.copy())
             X.append(df_tmp[:window])
             Y.append(df_tmp[-1 - days:][col_name][1:1 + days])
         return X, Y
+
+
+def get_ipo_date(code):
+    """获取上市日期
+
+    Args:
+        code (str): 股票代码
+
+    Returns:
+        datetime: 如果获取失败或者有异常会返回None
+    """
+    result = _get_tdx_ipo_date(code)
+    if not result:
+        result = _get_tushare_ipo_date(code)
+    return result
+
+
+def _get_tushare_ipo_date(code):
+    try:
+        return datetime.datetime.strptime(QA_fetch_stock_to_market_date(code),
+                                          '%Y-%m-%d')
+    except:
+        return None
+
+
+def _get_tdx_ipo_date(code):
+    try:
+        info = QA.QA_fetch_stock_info(code)
+        if not info.empty:
+            return datetime.datetime.strptime(str(info.loc[code]['ipo_date']),
+                                              '%Y%m%d')
+    except:
+        return None
+
+
+def get_block_code(code, type='zjhhy') -> (str):
+    """按照证监会行业分类，获取指定股票的同分类所有股票代码"""
+    df = QA_fetch_stock_block_adv()
+    k = df.get_code(code).data
+    name = k[k['type'] == type].reset_index()['blockname'].values[0]
+    return [c for c in df.get_block(name).code if c != code]
