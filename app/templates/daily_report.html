@@ -18,7 +18,7 @@
 </head>
 <body>
 <h1>{{ title }}</h1>
-<table class="table table-sm" id="dtBasicExample">
+<table class="table table-sm table-hover" id="dtBasicExample">
     <thead>
     <tr>
         <th scope="col" rowspan="2">代码</th>
@@ -47,10 +47,10 @@
         <td>{{item['last_date']}}</td>
         <td class="price">{{item['last_price']}}</td>
         {% for i in range(item['precents']|length) %}
-        <th scope="col" class="percent">{{item['precents'][i]}}</th>
-        <th scope="col" class="price">{{item['feature_price'][i]}}</th>
-        <th scope="col" class="percent">{{item['feature_price'][i]/item['last_price']}}</th>
-        <th scope="col" class="price">{{item['feature_price'][i]-item['last_price']}}</th>
+        <td scope="col" class="percent">{{item['precents'][i]}}</td>
+        <td scope="col" class="price">{{item['feature_price'][i]}}</td>
+        <td scope="col" class="percent">{{item['feature_price'][i]/item['last_price']}}</td>
+        <td scope="col" class="price">{{item['feature_price'][i]-item['last_price']}}</td>
         {% endfor %}
     </tr>
     {% endfor %}

@@ -1,6 +1,29 @@
-body{background-color:#080808;}
-h1,h2,h3,h4,h5,h6,h7{color:#ffb11b;}
-.table thead th,.table th{color:#ffb11b;}
-.table td{color:#fcfaf2}
+h1,h2,h3,h4,h5,h6,h7{color:#fecb00;}
+.table thead th,.table th{color:#fecb00;}
+.table td{color:#d5d6d8}
 table.dataTable tbody tr{background-color:transparent;}
 .price,.percent{text-align: right;font-weight:normal;}
+
+body{background-color:#1d1e25;color:#d5d6d8;font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;font-size:14px;padding:20px;}
+
+.color_blue{color:#0094b3}
+.color_mulberry{color:#a14685}
+.color_gray{color:#1d1e25}
+.color_gray_light{color:#d5d6d8}
+.color_white{color:#ffffff}
+.color_green{color:#19b772}
+.color_yellow{color:#fecb00}
+.color_red{color:#da353b}
+
+.text{font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;}
+.head_max{font-family: 'Source Sans Pro', sans-serif;font-size:24px;letter-spacing:-0.03em;}
+.head_middle{font-family: 'Source Sans Pro', sans-serif;font-size:20px;letter-spacing:-0.03em;}
+.head_normal{font-family: 'Source Sans Pro', sans-serif;font-size:18px;letter-spacing:-0.03em;}
+
+td.td_up{background-color:#da353b;color:#d5d6d8}
+td.td_down{background-color:#19b772;color:#d5d6d8}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+  background-color: #ffffff;
+  color:#1d1e25
+}
