@@ -1,39 +1,70 @@
+import wmi
+from LSTM_for_Stock.data_processor import Wrapper_default
+from scipy import stats
+import seaborn as sns
+import sklearn
+from LSTM_for_Stock.loss import root_mean_squared_error
+import matplotlib
+import numpy as np
+import time
+import matplotlib.pyplot as plt
+from keras.callbacks import EarlyStopping
+from keras.backend import clear_session
+from keras.layers import CuDNNLSTM
+from keras.layers import LSTM
+from keras.layers import Dense
+from keras.models import Sequential
+from LSTM_for_Stock.model import SequentialModel
+from LSTM_for_Stock.data_processor import Normalize
+from LSTM_for_Stock.data_processor import DataLoaderStock
+from LSTM_for_Stock.data_processor import DataHelper
+import pandas as pd
 import os
 import sys
 
 nb_dir = os.path.split(os.getcwd())[0]
 if nb_dir not in sys.path:
     sys.path.append(nb_dir)
-import pandas as pd
-from LSTM_for_Stock.data_processor import DataHelper
-from LSTM_for_Stock.data_processor import DataLoaderStock
-from LSTM_for_Stock.data_processor import Normalize
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import LSTM
-from keras.backend import clear_session
-from keras.callbacks import EarlyStopping
-import matplotlib.pyplot as plt
-import time
-import numpy as np
-import matplotlib
-from LSTM_for_Stock.loss import root_mean_squared_error
 
 matplotlib.rcParams["figure.figsize"] = [16, 5]
 matplotlib.rcParams['font.family'] = 'sans-serif'
 matplotlib.rcParams['font.sans-serif'] = ['Noto Sans CJK SC', 'SimHei']
 matplotlib.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号\n
-import sklearn
-import seaborn as sns
-from scipy import stats
-from LSTM_for_Stock.data_processor import Wrapper_default
 
 
-def do(code='000002', window=5, days=3, wrapper=Wrapper_default(),
+def print_system_info():
+    computer = wmi.WMI()
+    computer_info = computer.Win32_ComputerSystem()[0]
+    os_info = computer.Win32_OperatingSystem()[0]
+    proc_info = computer.Win32_Processor()[0]
+    gpu_info = computer.Win32_VideoController()[0]
+
+    os_name = os_info.Name.encode('utf-8').split(b'|')[0]
+    os_version = ' '.join([os_info.Version, os_info.BuildNumber])
+    system_ram = float(os_info.TotalVisibleMemorySize) / 1048576  # KB to GB
+
+    print('OS Name: {0}'.format(os_name))
+    print('OS Version: {0}'.format(os_version))
+    print('CPU: {0}'.format(proc_info.Name))
+    print('RAM: {0} GB'.format(system_ram))
+    print('Graphics Card: {0}'.format(gpu_info.Name))
+
+
+def do(code='000002',
+       window=3,
+       days=1,
+       wrapper=Wrapper_default(),
        norm=Normalize(),
-       *args, **kwargs):
-    dl = DataLoaderStock(code, wrapper=wrapper,
-                         appends=kwargs.pop('appends', []))
+       *args,
+       **kwargs):
+    """
+
+    Args:
+        layers [dict]: 训练层定义。默认为LSTM。第一层的`input_shape`和最后一层的`unit`会自动设置。
+
+    """
+    dl = DataLoaderStock(
+        code, wrapper=wrapper, appends=kwargs.pop('appends', []))
     df = dl.load()
     # print(df.head(window+2))
     train, test = DataHelper.train_test_split(df, batch_size=window + days)
@@ -62,7 +93,7 @@ def do(code='000002', window=5, days=3, wrapper=Wrapper_default(),
         Y_test_arr.append(y.values)
 
     clear_session()
-    model = Sequential()
+    model = SequentialModel()
     # https://www.researchgate.net/publication/327967988_Predicting_Stock_Prices_Using_LSTM
     # For analyzing the efficiency of the system  we are used  the
     # Root Mean Square Error(RMSE). The error or the difference between
@@ -72,35 +103,52 @@ def do(code='000002', window=5, days=3, wrapper=Wrapper_default(),
     # it  makes  an  excellent general  purpose  error  metric  for
     # numerical  predictions. Compared  to  the  similar  Mean  Absolute  Error,
     # RMSE amplifies and severely punishes large errors.
-    model.add(
-        LSTM(128, input_shape=X_train_arr[0].shape, return_sequences=True))
-    # model.add(Dropout(0.1))
-    model.add(LSTM(64, return_sequences=False))
-    model.add(Dense(16, activation='relu'))
-    model.add(Dense(days, activation='linear'))
-    model.compile(loss=root_mean_squared_error,
-                  optimizer="rmsprop",
-                  metrics=["mae", "acc"])
+
+    ls = kwargs.pop("layers", [])
+    c = kwargs.pop('compile', {'loss': root_mean_squared_error,
+                               'optimizer': 'rmsprop', 'metrics': ["mae", "acc"]})
+    if not ls:
+        ls.append({'type': 'lstm', 'units': 128})
+        ls.append({'type': 'dense'})
+    ls[0]['input_shape'] = X_train_arr[0].shape
+    ls[-1]['units'] = days
+
     start = time.time()
-    history = model.fit(
-        np.array(X_train_arr),
-        np.array(Y_train_arr),
-        epochs=kwargs.pop('epochs', 500),
-        shuffle=kwargs.pop('shuffle', False),
-        verbose=verbose,
-        batch_size=batch_size,
-        validation_split=kwargs.pop('validation_split', 0.15),
-        callbacks=[EarlyStopping(monitor="loss", patience=10, verbose=verbose,
-                                 mode="auto")]
-    )
+    model.build_model(ls, c)
+
+    model.train(np.array(X_train_arr),
+                np.array(Y_train_arr), callbacks=kwargs.pop('cbs', None), train={'epochs': kwargs.pop('epochs', 500), 'shuffle': kwargs.pop('shuffle', False), 'verbose': verbose,
+                                                                                 'batch_size': batch_size, 'validation_split': kwargs.pop('validation_split', 0.15)})
+
+    # history = model.fit(
+    #     np.array(X_train_arr),
+    #     np.array(Y_train_arr),
+    #     epochs=kwargs.pop('epochs', 500),
+    #     shuffle=kwargs.pop('shuffle', False),
+    #     verbose=verbose,
+    #     batch_size=batch_size,
+    #     validation_split=kwargs.pop('validation_split', 0.15),
+    #     callbacks=cbs)
     if kwargs.pop('summary', True):
-        model.summary()
+        model.model.summary()
     end = time.time()
-    return {'start': start, 'end': end, 'X_test_arr': X_test_arr,
-            'Y_test_arr': Y_test_arr, 'model': model, 'code': code,
-            'window': window, 'days': days, 'batch_size': batch_size,
-            'history': history, 'data': df, 'X_train': X_train,
-            'Y_train': Y_train, 'X_test': X_test, 'Y_test': Y_test}
+    return {
+        'start': start,
+        'end': end,
+        'X_test_arr': X_test_arr,
+        'Y_test_arr': Y_test_arr,
+        'model': model.model,
+        'code': code,
+        'window': window,
+        'days': days,
+        'batch_size': batch_size,
+        'history': model.history,
+        'data': df,
+        'X_train': X_train,
+        'Y_train': Y_train,
+        'X_test': X_test,
+        'Y_test': Y_test
+    }
 
 
 def show_history(h, *args, **kwargs):
@@ -151,17 +199,16 @@ def show_history(h, *args, **kwargs):
     pred = model.predict(np.array(X_test_arr))
     pred_slope = []
     for day in range(days):
-        df_result = pd.DataFrame(
-            {'pred': pred[:, day], 'real': np.array(Y_test_arr)[:, day]})
+        df_result = pd.DataFrame({
+            'pred': pred[:, day],
+            'real': np.array(Y_test_arr)[:, day]
+        })
 
         if show_plt:
             plt.figure(figsize=(15, 8))
             plt.title(
-                '预测。code={0},window={1},day={2}/{3},batch_size={4}'.format(code,
-                                                                           window,
-                                                                           day + 1,
-                                                                           days,
-                                                                           batch_size))
+                '预测。code={0},window={1},day={2}/{3},batch_size={4}'.format(
+                    code, window, day + 1, days, batch_size))
             plt.plot(df_result['pred'])
             plt.plot(df_result['real'])
             plt.show()
@@ -174,5 +221,9 @@ def show_history(h, *args, **kwargs):
         pred_slope.append(slope)
     plt.close('all')
 
-    return {'score': score, 'pred': pred, 'real': np.array(Y_test_arr),
-            'slope': pred_slope}
+    return {
+        'score': score,
+        'pred': pred,
+        'real': np.array(Y_test_arr),
+        'slope': pred_slope
+    }
