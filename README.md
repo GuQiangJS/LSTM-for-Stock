@@ -14,6 +14,17 @@
 
     <https://developer.nvidia.com/cuda-toolkit>。可以通过这里 <https://developer.nvidia.com/cuda-toolkit-archive> 选择需要的版本。我选的是 `9.0`。
 
+    > 验证安装：
+    >
+    > `nvcc --version`
+    >
+    > ```
+    > nvcc: NVIDIA (R) Cuda compiler driver
+    > Copyright (c) 2005-2017 NVIDIA Corporation
+    > Built on Fri_Sep__1_21:08:32_Central_Daylight_Time_2017
+    > Cuda compilation tools, release 9.0, V9.0.176
+    > ```
+
 2. 安装 cuDNN
 
     1. <https://developer.nvidia.com/rdp/cudnn-archive>。根据第一步CUDA的版本选择对应的版本。之前选择了 `9.0` 所以这里选择 `Download cuDNN XXXX for CUDA 9.0`
@@ -78,6 +89,18 @@
     > 验证是否安装成功：
     >
     > `python -c "import tensorflow as tf; tf.enable_eager_execution(); print(tf.reduce_sum(tf.random_normal([1000, 1000])))"`
+    >
+    > 输出内容：（我使用的是2GB版本的750Ti）
+    >
+    > ```
+    > 2019-04-16 09:40:50.964849: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+    > 432] Found device 0 with properties:
+    > name: GeForce GTX 750 Ti major: 5 minor: 0 memoryClockRate(GHz): 1.0845
+    > pciBusID: 0000:01:00.0
+    > totalMemory: 2.00GiB freeMemory: 1.83GiB
+    > 2019-04-16 09:40:50.965838: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+    > 511] Adding visible gpu devices: 0
+    > ```
 
 8. 安装 CNTK（微软的深度学习包）
 
@@ -138,28 +161,28 @@
 
 11. 重新安装 pytdx
 
-      ```
-      pip uninstall pytdx
-      pip install pytdx
-      ```
+       ```
+       pip uninstall pytdx
+       pip install pytdx
+       ```
 
 12. 安装 pyecharts_snapshot
 
-      `pip install pyecharts_snapshot`
+       `pip install pyecharts_snapshot`
 
 13. 安装 talib
 
-      `conda install -c quantopian ta-lib`
+       `conda install -c quantopian ta-lib`
 
 14. 安装 nb_conda_kernels 并设置对应关系（用于jupyter中可选Python运行环境）
 
-      `conda install ipykernel`， `python -m ipykernel install --user --name finance35 --display-name finance_py_35`
+       `conda install ipykernel`， `python -m ipykernel install --user --name finance35 --display-name finance_py_35`
 
 15. 安装 python.app
 
-      `conda install -c conda-forge python.app`
+       `conda install -c conda-forge python.app`
 
-      > 对于在Mac下运行来说，需要安装这个。**并且以 pythonw 方式运行**。否则会出现以下错误： ImportError: Python is not installed as a framework. The Mac OS X backend will not be able to function correctly if Python is not installed as a framework. See the Python documentation for more information on installing Python as a framework on Mac OS X. Please either reinstall Python as a framework, or try one of the other backends. If you are using (Ana)Conda please install python.app and replace the use of 'python' with 'pythonw'. See 'Working with Matplotlib on OSX' in the Matplotlib FAQ for more information. <https://matplotlib.org/faq/osx_framework.html#conda>
+       > 对于在Mac下运行来说，需要安装这个。**并且以 pythonw 方式运行**。否则会出现以下错误： ImportError: Python is not installed as a framework. The Mac OS X backend will not be able to function correctly if Python is not installed as a framework. See the Python documentation for more information on installing Python as a framework on Mac OS X. Please either reinstall Python as a framework, or try one of the other backends. If you are using (Ana)Conda please install python.app and replace the use of 'python' with 'pythonw'. See 'Working with Matplotlib on OSX' in the Matplotlib FAQ for more information. <https://matplotlib.org/faq/osx_framework.html#conda>
 
 ---
 
@@ -199,3 +222,18 @@ jupyter nbextensions_configurator enable --user
 [如何使用Pylint 来规范Python 代码风格 - IBM](https://www.ibm.com/developerworks/cn/linux/l-cn-pylint/index.html)
 
 `pip install pylint`
+
+---
+
+## 使用说明
+
+### 强制使用CPU
+
+在导入 `Keras` / `Tensorflow` 之前
+
+```
+import os
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+```
+
