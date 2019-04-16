@@ -241,7 +241,7 @@ class DataLoaderStock(DataLoader):
             df = d.data
         # 原始列名['open', 'high', 'low', 'close', 'volume', 'amount', 'preclose', 'adj']
         df = df.reset_index().drop(columns=['code']).set_index('date')
-        # df = df.astype('float32')
+        df = df.astype('float32')
         return df[self._stock_columns]
 
     def __fetch_index_day(self) -> pd.DataFrame:
@@ -250,7 +250,7 @@ class DataLoaderStock(DataLoader):
         d = QA.QA_fetch_index_day_adv(
             self.__benchmark_code, start=self.__start, end=self.__end)
         df = d.data.reset_index().drop(columns=['code']).set_index('date')
-        # df = df.astype('float32')
+        df = df.astype('float32')
         # 原始列名['open', 'high', 'low', 'close', 'up_count', 'down_count', 'volume','amount'],
         return df[self._index_columns]
 
@@ -277,7 +277,7 @@ class DataLoaderStock(DataLoader):
                 df = QA.QAFetch.QATdx.QA_fetch_get_stock_day(code,
                                                              start,
                                                              end)
-                # df = df.astype('float32')
+                df = df.astype('float32')
                 # 原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'code', 'date', 'date_stamp'] pylint: disable=C0301
                 return df.rename(columns={'vol': 'volume'})[self._stock_columns]
             except socket.timeout:
@@ -296,7 +296,7 @@ class DataLoaderStock(DataLoader):
             try:
                 df = QA.QAFetch.QATdx.QA_fetch_get_index_day(
                     self.__benchmark_code, self.__start, self.__end)
-                # df = df.astype('float32')
+                df = df.astype('float32')
                 # 原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'up_count', 'down_count', 'date', 'code', 'date_stamp'] pylint: disable=C0301
                 return df.rename(columns={'vol': 'volume'})[self._index_columns]
             except socket.timeout:
