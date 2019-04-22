@@ -176,10 +176,27 @@ class SequentialModel(Model):
             sample_weight=sample_weight)
 
     def save(self, filepath):
+        """保存模型
+
+        Args:
+            filepath (str): 待保存的完整路径。
+
+        Returns:
+
+        """
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         self.model.save(filepath)
 
     def load(self, filepath, clear=True):
+        """从文件中读取模型
+
+        Args:
+            filepath (str): 文件完整路径。
+            clear (bool): 是否清除当前计算图。默认为True。
+
+        Returns:
+
+        """
         if clear:
             clear_session()
         self.__model = load_model(filepath)
