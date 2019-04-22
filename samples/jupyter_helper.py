@@ -1,26 +1,22 @@
-import wmi
-from LSTM_for_Stock.data_processor import Wrapper_default
-from scipy import stats
-import seaborn as sns
-import sklearn
-from LSTM_for_Stock.loss import root_mean_squared_error
-import matplotlib
-import numpy as np
-import time
-import matplotlib.pyplot as plt
-from keras.callbacks import EarlyStopping
-from keras.backend import clear_session
-from keras.layers import CuDNNLSTM
-from keras.layers import LSTM
-from keras.layers import Dense
-from keras.models import Sequential
-from LSTM_for_Stock.model import SequentialModel
-from LSTM_for_Stock.data_processor import Normalize
-from LSTM_for_Stock.data_processor import DataLoaderStock
-from LSTM_for_Stock.data_processor import DataHelper
-import pandas as pd
 import os
 import sys
+import time
+
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import wmi
+from keras.backend import clear_session
+from scipy import stats
+
+from LSTM_for_Stock.data_processor import DataHelper
+from LSTM_for_Stock.data_processor import DataLoaderStock
+from LSTM_for_Stock.data_processor import Normalize
+from LSTM_for_Stock.data_processor import Wrapper_default
+from LSTM_for_Stock.loss import root_mean_squared_error
+from LSTM_for_Stock.model import SequentialModel
 
 nb_dir = os.path.split(os.getcwd())[0]
 if nb_dir not in sys.path:
@@ -106,7 +102,8 @@ def do(code='000002',
 
     ls = kwargs.pop("layers", [])
     c = kwargs.pop('compile', {'loss': root_mean_squared_error,
-                               'optimizer': 'rmsprop', 'metrics': ["mae", "acc"]})
+                               'optimizer': 'rmsprop',
+                               'metrics': ["mae", "acc"]})
     if not ls:
         ls.append({'type': 'lstm', 'units': 128})
         ls.append({'type': 'dense'})
@@ -117,8 +114,13 @@ def do(code='000002',
     model.build_model(ls, c)
 
     model.train(np.array(X_train_arr),
-                np.array(Y_train_arr), callbacks=kwargs.pop('cbs', None), train={'epochs': kwargs.pop('epochs', 500), 'shuffle': kwargs.pop('shuffle', False), 'verbose': verbose,
-                                                                                 'batch_size': batch_size, 'validation_split': kwargs.pop('validation_split', 0.15)})
+                np.array(Y_train_arr), callbacks=kwargs.pop('cbs', None),
+                train={'epochs': kwargs.pop('epochs', 500),
+                       'shuffle': kwargs.pop('shuffle', False),
+                       'verbose': verbose,
+                       'batch_size': batch_size,
+                       'validation_split': kwargs.pop('validation_split',
+                                                      0.15)})
 
     # history = model.fit(
     #     np.array(X_train_arr),
@@ -217,7 +219,7 @@ def show_history(h, *args, **kwargs):
             plt.show()
         slope = stats.linregress(pred[:, day],
                                  np.array(Y_test_arr)[:, day]).slope
-        print('Slope Day{0}:{1}'.format(day + 1, slope))
+        # print('Slope Day{0}:{1}'.format(day + 1, slope))
         pred_slope.append(slope)
     plt.close('all')
 
