@@ -409,6 +409,8 @@ class DataHelper(object):
     @staticmethod
     def xy_split_1(dfs, window, days, col_name='close', norm=Normalize()):
         """拆分 `train_test_split` 返回的 `train` 和 `test` 结果。
+        * 与 `xy_split_2` 的区别在于。本函数拆分的结果集y的开始值
+          是**相对于结果集x的最后一条数据**的。
 
         Args:
             dfs ([pd.DataFrame]): `train` 和 `test` 结果
@@ -468,6 +470,8 @@ class DataHelper(object):
     @staticmethod
     def xy_split_2(dfs, window, days, col_name='close', norm=Normalize()):
         """拆分 `train_test_split` 返回的 `train` 和 `test` 结果。
+        * 与 `xy_split_1` 的区别在于。本函数拆分的结果集y的开始值
+          是**相对于结果集x的第一条数据**的。
 
         Args:
             dfs ([pd.DataFrame]): `train` 和 `test` 结果
