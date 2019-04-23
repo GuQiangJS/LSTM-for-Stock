@@ -2,21 +2,20 @@
 训练 DataLoaderStock 及 相关的 Wrapper
 """
 import datetime
-
-import pytest
-import warnings
 import logging
+
+import numpy as np
+import pandas as pd
+from QUANTAXIS.QAFetch.QAQuery_Advance import \
+    QA_fetch_stock_block_adv as get_block
+
 from LSTM_for_Stock.data_processor import DataLoader
 from LSTM_for_Stock.data_processor import DataLoaderStock
-import numpy as np
 from LSTM_for_Stock.data_processor import Wrapper
-from LSTM_for_Stock.data_processor import Wrapper_fillna
 from LSTM_for_Stock.data_processor import Wrapper_default
-import pandas as pd
-import QUANTAXIS as QA
-from QUANTAXIS.QAFetch.QAQuery_Advance import QA_fetch_stock_block_adv as get_block
-from QUANTAXIS.QAFetch.QAQuery import QA_fetch_stock_to_market_date
-
+from LSTM_for_Stock.data_processor import Wrapper_fillna
+from LSTM_for_Stock.data_processor import get_ipo_date
+from LSTM_for_Stock.data_processor import get_block_code
 
 def test_init():
     dl = DataLoaderStock('601398')
@@ -71,11 +70,15 @@ def test_init():
 
 def test_fetch_stock_day_online():
     dl = DataLoaderStock('601398')
-    df = dl._DataLoaderStock__fetch_stock_day_online()
+    df = dl._DataLoaderStock__fetch_stock_day_online(dl.stock_code,
+                                                     dl.start,
+                                                     dl.end)
     logging.info(df.columns)
     logging.info(df.head())
     assert set(dl._stock_columns) == set(df.columns)
     assert not df.empty
+    for col in df.columns:
+        assert df[col].dtype == np.float32
 
 
 def test_fetch_index_day_online():
@@ -85,15 +88,21 @@ def test_fetch_index_day_online():
     logging.info(df.head())
     assert set(dl._index_columns) == set(df.columns)
     assert not df.empty
+    for col in df.columns:
+        assert df[col].dtype == np.float32
 
 
 def test_fetch_stock_day():
     dl = DataLoaderStock('601398')
-    df = dl._DataLoaderStock__fetch_stock_day()
+    df = dl._DataLoaderStock__fetch_stock_day(dl.stock_code,
+                                              dl.start,
+                                              dl.end)
     logging.info(df.columns)
     logging.info(df.head())
     assert set(dl._stock_columns) == set(df.columns)
     assert not df.empty
+    for col in df.columns:
+        assert df[col].dtype == np.float32
 
 
 def test_fetch_index_day():
@@ -103,6 +112,8 @@ def test_fetch_index_day():
     logging.info(df.head())
     assert set(dl._index_columns) == set(df.columns)
     assert not df.empty
+    for col in df.columns:
+        assert df[col].dtype == np.float32
 
 
 def test_load():
@@ -135,14 +146,8 @@ def test_load():
 
 def _test_dt(code):
     """判断股票上市时间是否晚于指定时间"""
-    s = QA_fetch_stock_to_market_date(code)
-    end=datetime.datetime(2005,1, 1)
-    if s:
-        return datetime.datetime.strptime(s,'%Y-%m-%d')<=end
     try:
-        return datetime.datetime.strptime(str(
-            QA.QAFetch.QATdx.QA_fetch_get_stock_info(code).iloc[0]['ipo_date']),
-            '%Y%m%d') <= end
+        return datetime.datetime(2005, 1, 1) >= get_ipo_date(code)
     except:
         return False
 
@@ -150,23 +155,18 @@ def _test_dt(code):
 def _test_code(code):
     return code[0] in ['0', '3', '6']
 
-
-def get_block_code(code) -> (str):
-    """按照证监会行业分类，获取指定股票的同分类所有股票代码"""
-    df = get_block()
-    code_block = df.get_code(code).data
-    code_zjh_lbock_name = \
-    code_block[code_block['type'] == 'zjhhy'].reset_index()['blockname'].values[0]
-    return [c for c in df.get_block(code_zjh_lbock_name).code if c != code]
-
-
 def test_append_codes():
     codes = [code for code in get_block_code('000002') if
              _test_dt(code) and _test_code(code)]
     dl = DataLoaderStock('000002', wrapper=Wrapper_default(),
                          appends=codes)
+    print(codes)
+    assert len(codes)>0
     df = dl.load()
-    pass
+    assert not df.empty
+    print(df)
+    print(len(df.columns))
+
 
 # def test_111():
 #     import time

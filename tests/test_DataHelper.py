@@ -2,13 +2,12 @@
 测试数据拆分 DataHelper
 """
 
-import pytest
-import pandas as pd
-from LSTM_for_Stock.data_processor import DataHelper
 import logging
+
 import numpy as np
-from numpy import array_equal as arr_eq
-from numpy import array as arr
+import pandas as pd
+
+from LSTM_for_Stock.data_processor import DataHelper
 
 
 def test_train_test_split_1():
@@ -218,24 +217,31 @@ def test_xy_split_1():
     arr = [i for i in range(2, 8)]
     window = len(arr) - 2
     days = 2
-    x, y = DataHelper.xy_split_1([pd.DataFrame(arr, columns=['c'])], window, days,
-                               col_name='c')
+    x, y = DataHelper.xy_split_1([pd.DataFrame(arr, columns=['c'])], window,
+                                 days,
+                                 col_name='c')
     logging.info(arr)
     logging.info(x)
     logging.info(y)
     logging.info(type(x[0]))
     logging.info(type(y[0]))
+    assert np.array_equal(np.array([1, 1.5, 2, 2.5]), np.array(x[0]['c'].values))
+    assert np.array_equal(np.array([1.2, 1.4]), np.array(y[0].values))
+
 
 def test_xy_split_2():
     arr = [i for i in range(2, 8)]
     window = len(arr) - 2
     days = 2
-    x, y = DataHelper.xy_split_2([pd.DataFrame(arr, columns=['c'])], window, days,
-                               col_name='c')
+    x, y = DataHelper.xy_split_2([pd.DataFrame(arr, columns=['c'])], window,
+                                 days,
+                                 col_name='c')
     logging.info(arr)
     logging.info(x)
     logging.info(y)
     logging.info(type(x[0]))
     logging.info(type(y[0]))
-    s=pd.Series()
+    s = pd.Series()
     s.describe()
+    assert np.array_equal(np.array([1, 1.5, 2, 2.5]), np.array(x[0]['c'].values))
+    assert np.array_equal(np.array([3, 3.5]), np.array(y[0].values))
