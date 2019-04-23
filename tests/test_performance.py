@@ -74,7 +74,7 @@ def test_model_load_complete():
 def test_model_load_split_clear():
     """此方法读取模型时间正常"""
     __save_split(__create_model().model)
-    for i in range(50):
+    for i in range(10):
         oldtime = datetime.datetime.now()
         clear_session()
         __load_split()
@@ -87,7 +87,7 @@ def test_model_load_split_clear():
 def test_model_load_complete_clear():
     """此方法读取模型时间正常"""
     __save_complete(__create_model().model)
-    for i in range(50):
+    for i in range(10):
         oldtime = datetime.datetime.now()
         clear_session()
         __load_complete()
