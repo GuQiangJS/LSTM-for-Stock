@@ -2,14 +2,14 @@
 
 import datetime
 import socket
-from LSTM_for_Stock import indicators
+
 import QUANTAXIS as QA
 import pandas as pd
-from sklearn.preprocessing import normalize
-import logging
-from QUANTAXIS.QAUtil import QA_util_datetime_to_strdate as datetostr
 from QUANTAXIS.QAFetch.QAQuery import QA_fetch_stock_to_market_date
 from QUANTAXIS.QAFetch.QAQuery_Advance import QA_fetch_stock_block_adv
+from QUANTAXIS.QAUtil import QA_util_datetime_to_strdate as datetostr
+
+from LSTM_for_Stock import indicators
 
 
 class Wrapper(object):
@@ -127,6 +127,10 @@ class DataLoaderStock(DataLoader):
             end (str, optional): Defaults to DataLoader.today(). 結束日期
             wrapper (Wrapper, optional): Defaults to Wrapper(). `DataFrame`包装器。
             appends (str): 待附加的股票代码列表。默认为空。
+            dtype : 读取数据时转换数据类型的定义。
+                    类型参考 :py:func:`DataFrame.astype(dtype, copy=True, errors='raise', **kwargs)` 中 `dtype` 的定义。
+                    默认为 `float32`。
+
         """
         self.__stock_code = stock_code
         self.__benchmark_code = benchmark_code
@@ -139,6 +143,7 @@ class DataLoaderStock(DataLoader):
         self.__data = pd.DataFrame()
         self.__loaded = False
         self.__appends = kwargs.pop('appends', [])
+        self.__dtype = kwargs.pop('dtype', 'float32')
 
     def load(self) -> pd.DataFrame:
         """读取数据。拼接 stock 和 benchmark 的数据。
@@ -173,7 +178,7 @@ class DataLoaderStock(DataLoader):
         if not end:
             end = self.__end
         if self.__online:
-            return self.__fetch_stock_day_online(code)
+            return self.__fetch_stock_day_online(code, start, end)
         else:
             return self.__fetch_stock_day(code, start, end)
 
@@ -241,8 +246,7 @@ class DataLoaderStock(DataLoader):
             df = d.data
         # 原始列名['open', 'high', 'low', 'close', 'volume', 'amount', 'preclose', 'adj']
         df = df.reset_index().drop(columns=['code']).set_index('date')
-        df = df.astype('float32')
-        return df[self._stock_columns]
+        return df[self._stock_columns].astype(self.__dtype)
 
     def __fetch_index_day(self) -> pd.DataFrame:
         """獲取本地的指數日線數據。會丟棄 `code` 列。
@@ -250,9 +254,8 @@ class DataLoaderStock(DataLoader):
         d = QA.QA_fetch_index_day_adv(
             self.__benchmark_code, start=self.__start, end=self.__end)
         df = d.data.reset_index().drop(columns=['code']).set_index('date')
-        df = df.astype('float32')
         # 原始列名['open', 'high', 'low', 'close', 'up_count', 'down_count', 'volume','amount'],
-        return df[self._index_columns]
+        return df[self._index_columns].astype(self.__dtype)
 
     @property
     def _index_columns(self) -> [str]:
@@ -277,9 +280,10 @@ class DataLoaderStock(DataLoader):
                 df = QA.QAFetch.QATdx.QA_fetch_get_stock_day(code,
                                                              start,
                                                              end)
-                df = df.astype('float32')
                 # 原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'code', 'date', 'date_stamp'] pylint: disable=C0301
-                return df.rename(columns={'vol': 'volume'})[self._stock_columns]
+                df = df.rename(columns={'vol': 'volume'})[self._stock_columns]
+                df = df.astype(self.__dtype)
+                return df
             except socket.timeout:
                 if retries < times:
                     retries = retries + 1
@@ -296,9 +300,10 @@ class DataLoaderStock(DataLoader):
             try:
                 df = QA.QAFetch.QATdx.QA_fetch_get_index_day(
                     self.__benchmark_code, self.__start, self.__end)
-                df = df.astype('float32')
                 # 原始列名['open', 'close', 'high', 'low', 'vol', 'amount', 'up_count', 'down_count', 'date', 'code', 'date_stamp'] pylint: disable=C0301
-                return df.rename(columns={'vol': 'volume'})[self._index_columns]
+                df = df.rename(columns={'vol': 'volume'})[self._index_columns]
+                df = df.astype(self.__dtype)
+                return df
             except socket.timeout:
                 if retries < times:
                     retries = retries + 1
