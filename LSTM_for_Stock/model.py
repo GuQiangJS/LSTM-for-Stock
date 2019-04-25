@@ -1,13 +1,16 @@
+import os
+
+from keras.backend import clear_session
 from keras.callbacks import EarlyStopping
+from keras.layers import CuDNNLSTM
 from keras.layers import Dense
 from keras.layers import Dropout
 from keras.layers import LSTM
 from keras.models import Sequential
 from keras.models import load_model
+
 from LSTM_for_Stock.unit import get_param_default_value as def_val
-import os
-from keras.backend import clear_session
-from keras.layers import CuDNNLSTM
+
 
 class Model(object):
     pass
@@ -187,7 +190,7 @@ class SequentialModel(Model):
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         self.model.save(filepath)
 
-    def load(self, filepath, clear=True):
+    def load(self, filepath, custom_objects=None, compile=True, clear=True):
         """从文件中读取模型
 
         Args:
@@ -199,4 +202,5 @@ class SequentialModel(Model):
         """
         if clear:
             clear_session()
-        self.__model = load_model(filepath)
+        self.__model = load_model(filepath, custom_objects=custom_objects,
+                                  compile=compile)
