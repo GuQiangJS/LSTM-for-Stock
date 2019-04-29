@@ -18,11 +18,20 @@ $('#dtBasicExample').DataTable({
 });
 //$('.dataTables_length').addClass('bs-select');
 });
-$(".price").each(function(){
-	s=parseFloat(this.innerText);
-    this.innerText=numeral(s).format('0.0000')
-})
-$(".percent").each(function(){
-	setClass(this,parseFloat(this.innerText));
-    this.innerText=numeral(this.innerText/100).format('0.00%')
-})
+// $(".price").each(function(){
+// 	s=parseFloat(this.innerText);
+//     this.innerText=numeral(s).format('0.0000')
+// })
+// $(".percent").each(function(){
+// 	setClass(this,parseFloat(this.innerText));
+//     this.innerText=numeral(this.innerText/100).format('0.00%')
+// })
+
+$(document).ready(function(){
+  $("#SearchInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#dtBasicExample tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
