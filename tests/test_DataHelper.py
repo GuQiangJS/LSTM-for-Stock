@@ -245,3 +245,71 @@ def test_xy_split_2():
     s.describe()
     assert np.array_equal(np.array([1, 1.5, 2, 2.5]), np.array(x[0]['c'].values))
     assert np.array_equal(np.array([3, 3.5]), np.array(y[0].values))
+
+def test_xy_split_3():
+    arr = [i for i in range(2, 8)]
+    window = len(arr) - 2
+    days = 2
+    x, y = DataHelper.xy_split_3([pd.DataFrame(arr, columns=['c'])], window,
+                                 days,
+                                 col_name='c')
+    logging.info(arr)
+    logging.info(x)
+    logging.info(y)
+    logging.info(type(x[0]))
+    logging.info(type(y[0]))
+    s = pd.Series()
+    s.describe()
+    assert np.array_equal(np.array([1, 1.5, 2, 2.5]), np.array(x[0]['c'].values))
+    assert np.array_equal(np.array([3.5]), np.array(y[0].values))
+
+def test_xy_split_3_1():
+    arr = [i for i in range(2, 8)]
+    window = len(arr) - 1
+    days = 1
+    x, y = DataHelper.xy_split_3([pd.DataFrame(arr, columns=['c'])], window,
+                                 days,
+                                 col_name='c')
+    logging.info(arr)
+    logging.info(x)
+    logging.info(y)
+    logging.info(type(x[0]))
+    logging.info(type(y[0]))
+    s = pd.Series()
+    s.describe()
+    assert np.array_equal(np.array([1, 1.5, 2, 2.5,3]), np.array(x[0]['c'].values))
+    assert np.array_equal(np.array([3.5]), np.array(y[0].values))
+
+def test_xy_split_3_2():
+    arr = [i for i in range(2, 8)]
+    window = len(arr) - 2
+    days = 2
+    x, y = DataHelper.xy_split_3([pd.DataFrame(arr, columns=['c'])], window,
+                                 days,
+                                 col_name='c')
+    logging.info(arr)
+    logging.info(x)
+    logging.info(y)
+    logging.info(type(x[0]))
+    logging.info(type(y[0]))
+    s = pd.Series()
+    s.describe()
+    assert np.array_equal(np.array([1, 1.5, 2, 2.5]), np.array(x[0]['c'].values))
+    assert np.array_equal(np.array([3.5]), np.array(y[0].values))
+
+def test_xy_split_3_3():
+    arr = [i for i in range(2, 8)]
+    window = len(arr) - 3
+    days = 3
+    x, y = DataHelper.xy_split_3([pd.DataFrame(arr, columns=['c'])], window,
+                                 days,
+                                 col_name='c')
+    logging.info(arr)
+    logging.info(x)
+    logging.info(y)
+    logging.info(type(x[0]))
+    logging.info(type(y[0]))
+    s = pd.Series()
+    s.describe()
+    assert np.array_equal(np.array([1, 1.5, 2]), np.array(x[0]['c'].values))
+    assert np.array_equal(np.array([3.5]), np.array(y[0].values))
