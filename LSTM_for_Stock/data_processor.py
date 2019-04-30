@@ -534,6 +534,65 @@ class DataHelper(object):
             Y.append(df_tmp[-1 - days:][col_name][1:1 + days])
         return X, Y
 
+    @staticmethod
+    def xy_split_3(dfs, window, days, col_name='close', norm=Normalize()):
+        """拆分 `train_test_split` 返回的 `train` 和 `test` 结果。
+        * 与 `xy_split_2` 的区别在于。本函数拆分的结果集y只取的最后一条的数据。*
+
+        Args:
+            dfs ([pd.DataFrame]): `train` 和 `test` 结果
+            norm: 数据构造器。实现了 `build` 方法的类均可。
+                如果为空则会自动为 `Normalize_Empty` 。
+                默认为 `Normalize`。
+            window (int): 窗口期
+            days (int): 结果期
+            col_name (str): 结果期取值的列名
+
+        Returns:
+            [[pd.DataFrame],[pd.Series]]: 按照 window,days 拆分后的集合。
+                X中包含所有列。Y中只包含 `col_name` 指定的列。
+                **Y 返回的结果是相对于返回集合的前一条数据做的`norm`处理。**
+
+        See Also:
+            * :py:func:`LSTM_for_Stock.DataHelper.xy_split_1`
+            * :py:func:`LSTM_for_Stock.DataHelper.xy_split_2`
+
+        Examples:
+
+            >>> arr = [i for i in range(2, 8)]
+            >>> window = len(arr) - 2
+            >>> days = 2
+            >>> window, days
+            4, 2
+            >>> x, y = DataHelper.xy_split_2([pd.DataFrame(arr, columns=['c'])],
+            ...                              window, days, col_name='c')
+            >>> x
+            [      c
+                0  1.0
+                1  1.5
+                2  2.0
+                3  2.5]
+
+            **与 :func:`~DataHelper.xy_split_2` 不同的是 本函数拆分的结果集y只取的最后一条的数据**
+
+            >>> y
+            [5    3.5
+            Name: c, dtype: float64]
+            >>> type(x[0])
+            <class 'pandas.core.frame.DataFrame'>
+            >>> type(y[0])
+            <class 'pandas.core.series.Series'>
+
+        """
+        X = []
+        Y = []
+        if norm is None:
+            norm = Normalize()
+        for df in dfs:
+            df_tmp = norm.build(df.copy())
+            X.append(df_tmp[:window])
+            Y.append(df_tmp[-1:][col_name])
+        return X, Y
 
 def get_ipo_date(code):
     """获取上市日期
