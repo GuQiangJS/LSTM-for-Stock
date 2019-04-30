@@ -117,8 +117,9 @@ def start_code(code, window, days):
     d['precents'] = y
     d['feature_price'] = feature_price
     d['acc'] = get_train_acc(code, window, days)
+    last_dt = get_last_train_date(code, window, days)
     d['last_train_date'] = QA_util_datetime_to_strdate(
-        get_last_train_date(code, window, days))
+        last_dt) if last_dt else ''
     # for i in range(len(y)):
     #     d['day{}_per'.format(i + 1)] = y[i]
     #     d['day{}_pri'.format(i + 1)] = feature_price[i]
@@ -151,7 +152,7 @@ for window, lst in lst_w.items():
         rc = start_code(l[0], int(l[1]), int(l[2]))
         result_full[window].append(rc)
         for p in rc['precents']:
-            if p > 1:
+            if p > 1.1 and rc['last_change'] * 100 < 9.8:
                 result_simple[window].append(rc)
                 break
 
