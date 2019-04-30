@@ -264,7 +264,7 @@ def get_last_train_date(code, window, days):
 def get_train_acc(code,window,days):
     dic = _read_train_record(code)
     record = _find_train_record(dic, window, days)
-    return record['acc'] if record is not None and 'acc' in record.keys() else ''
+    return record['acc'] if record is not None and 'acc' in record.keys() else -1
 
 def do(code,
        window=3,
