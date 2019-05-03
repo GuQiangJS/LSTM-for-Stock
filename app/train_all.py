@@ -3,7 +3,7 @@
 import os
 import sys
 
-nb_dir = os.path.split(os.getcwd())[0]
+nb_dir = os.path.split(os.path.dirname(__file__))[0]
 if nb_dir not in sys.path:
     sys.path.append(nb_dir)
 if os.getcwd() not in sys.path:
@@ -261,10 +261,13 @@ def get_last_train_date(code, window, days):
     return QA_util_to_datetime(record['time']) \
         if record is not None and 'time' in record.keys() else None
 
-def get_train_acc(code,window,days):
+
+def get_train_acc(code, window, days):
     dic = _read_train_record(code)
     record = _find_train_record(dic, window, days)
-    return record['acc'] if record is not None and 'acc' in record.keys() else -1
+    return record[
+        'acc'] if record is not None and 'acc' in record.keys() else -1
+
 
 def do(code,
        window=3,
@@ -291,9 +294,10 @@ def do(code,
     train, test = DataHelper.train_test_split(df,
                                               train_size=0.95,
                                               batch_size=window + days)
+    split_func = kwargs.pop('split_func', DataHelper.xy_split_3)
     # print(train[0])
-    X_train, Y_train = DataHelper.xy_split_2(train, window, days, norm=norm)
-    X_test, Y_test = DataHelper.xy_split_2(test, window, days, norm=norm)
+    X_train, Y_train = split_func(train, window, days, norm=norm)
+    X_test, Y_test = split_func(test, window, days, norm=norm)
 
     batch_size = kwargs.pop('batch_size', 512)
     verbose = kwargs.pop('train_verbose', 0)
@@ -348,6 +352,8 @@ def do(code,
     score = model.evaluate(np.array(X_test_arr), np.array(Y_test_arr))
     # pred_slope = []
     for day in range(days):
+        if split_func == DataHelper.xy_split_3:
+            day = -1
         df_result = pd.DataFrame(
             {'pred': pred[:, day], 'real': np.array(Y_test_arr)[:, day]})
 
@@ -363,16 +369,25 @@ def do(code,
         plt.figure(figsize=(15, 8))
         save_path = os.path.join(os.path.join(nb_dir, '.train_result'),
                                  'pred_{2}_{0:02d}_{1:02d}_{3:02d}.svg'.format(
-                                     window, days,
-                                     code, day + 1))
+                                     window,
+                                     days if split_func != DataHelper.xy_split_3 else days,
+                                     code,
+                                     day + 1 if split_func != DataHelper.xy_split_3 else days))
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
         plt.title(
             '{0} Window:{1},Days:{5}/{2},BatchSize:{3},Optimizer:{4}'.format(
-                code, window, days, batch_size, optimizer, day + 1
+                code, window,
+                days if split_func != DataHelper.xy_split_3 else days,
+                batch_size, optimizer,
+                day + 1 if split_func != DataHelper.xy_split_3 else days
             ))
         plt.plot(df_result['pred'])
         plt.plot(df_result['real'])
+        plt.xticks(np.arange(0,len(df_result.index),1))
         plt.savefig(save_path, format="svg")
+
+        if split_func == DataHelper.xy_split_3:
+            break
     # RuntimeWarning: More than 20 figures have been opened. Figures created
     # through the pyplot interface (`matplotlib.pyplot.figure`) are retained
     # until explicitly closed and may consume too much memory. (To control
@@ -395,13 +410,10 @@ def do(code,
     # return {'slope': pred_slope}
 
 
-if __name__ == "__main__":
-
-    # save_train_record("123", 5, 3)
-    # d1 = get_last_train_date('123', 5, 3)
-    # d2 = get_last_train_date('123', 4, 3)
-    days = 1
+def do_train():
+    days = [1, 2, 3, 4, 5]
     skip_days = 10  # 10天内不重新计算
+    window = days[-1] + 1
     start = '1990-01-01'
     end = QA_util_datetime_to_strdate(datetime.today())
     lst = QA.QA_fetch_stock_list_adv().code.values
@@ -413,20 +425,20 @@ if __name__ == "__main__":
             logging.info(
                 '{0}/{1} - {2}'.format(list(lst).index(code) + 1, len(lst),
                                        code))
-            for window in [2, 3]:
-                dt = get_last_train_date(code, window, days)
-                if dt != None and dt + timedelta(days=skip_days) > datetime.today():
+            for day in days:
+                dt = get_last_train_date(code, window, day)
+                if dt != None and dt + timedelta(
+                        days=skip_days) > datetime.today():
                     logging.info(
                         'SKIP:{0},Window:{1}.LastTrain:{2}.距今小于 {3}'.format(
                             code, window, QA_util_datetime_to_strdate(dt),
                             skip_days
                         ))
                     continue
-                do(code, window=window, days=days)
+                do(code, window=window, days=day)
                 logging.info('window={} Done.'.format(window))
             logging.info(
                 '{0}/{1} - {2} - Done.'.format(list(lst).index(code) + 1,
                                                len(lst), code))
         else:
             logging.info("SKIP:" + code)
-
