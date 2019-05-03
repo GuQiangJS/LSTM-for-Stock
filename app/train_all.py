@@ -327,7 +327,7 @@ def do(code,
         ls.append({'type': 'lstm', 'units': first_units})
         ls.append({'type': 'dense'})
     ls[0]['input_shape'] = X_train_arr[0].shape
-    ls[-1]['units'] = days
+    ls[-1]['units'] = 1 if split_func == DataHelper.xy_split_3 else days
     model.build_model(ls, c)
     history = model.train(np.array(X_train_arr),
                           np.array(Y_train_arr),
