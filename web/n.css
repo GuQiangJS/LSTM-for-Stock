@@ -1,7 +1,7 @@
 h1,h2,h3,h4,h5,h6,h7{color:#fecb00;}
-.table thead th,.table th{color:#fecb00;}
-.table td{color:#d5d6d8}
-table.dataTable tbody tr{background-color:transparent;}
+.table thead th,.table th{color:#fecb00;font-size:12px;}
+.table td{color:#d5d6d8;vertical-align: middle}
+table.dataTable tbody tr{background-color:transparent;font-size:12px}
 .price,.percent{text-align: right;font-weight:normal;}
 
 body{background-color:#1d1e25;color:#d5d6d8;font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;font-size:14px;padding:20px;}
