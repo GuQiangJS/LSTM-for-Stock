@@ -22,22 +22,20 @@
 <table class="table table-sm table-hover" id="dtBasicExample">
     <thead>
     <tr>
-        <th scope="col" rowspan="2">窗口期</th>
-        <th scope="col" rowspan="2">名称</th>
-        <th scope="col" rowspan="2">代码</th>
+        <th scope="col" rowspan="2">名称<br/>代码</th>
         <th scope="col" rowspan="2">预测基准日期</th>
         <th scope="col" rowspan="2">预测基准价格</th>
         <th scope="col" rowspan="2">最后交易日期</th>
         <th scope="col" rowspan="2">最后交易价格</th>
         <th scope="col" rowspan="2">最后变化率</th>
-        <th scope="col" rowspan="2">准确率</th>
-        <th scope="col" rowspan="2">训练日期</th>
-        {% for i in range(result[0]['precents']|length) %}
-        <th scope="col" colspan="4">Day{{i+1}}</th>
+        <th scope="col" rowspan="2" style="display: none;">训练日期</th>
+        {% for i in range(result[0]['days']|length) %}
+        <th scope="col" colspan="5">Day{{i+1}}</th>
         {% endfor %}
     </tr>
     <tr>
-        {% for i in range(result[0]['precents']|length) %}
+        {% for i in range(result[0]['days']|length) %}
+        <th scope="col">准确率</th>
         <th scope="col">变化率</th>
         <th scope="col">预测值</th>
         <th scope="col">差率</th>
@@ -47,21 +45,19 @@
     </thead>
     {% for item in result %}
     <tr>
-        <td scope="row">{{item['window']}}</td>
-        <td scope="row">{{item['name']}}</td>
-        <td scope="row"><a href="http://gu.qq.com/{{'sh' if item['code'][0]==6 else 'sz'}}{{item['code']}}/gp" target="_blank">{{item['code']}}</a></td>
+        <td scope="row">{{item['name']}}<br/><a href="http://gu.qq.com/{{'sh' if item['code'][0]==6 else 'sz'}}{{item['code']}}/gp" target="_blank">{{item['code']}}</a></td>
         <td>{{item['first_date']}}</td>
-        <td class="price">{{"{0:0.4f}".format(item['first_price'])}}</td>
+        <td class="price">{{"{0:0.2f}".format(item['first_price'])}}</td>
         <td>{{item['last_date']}}</td>
-        <td class="price">{{"{0:0.4f}".format(item['last_price'])}}</td>
+        <td class="price">{{"{0:0.2f}".format(item['last_price'])}}</td>
         <td class="percent">{{"{0:0.2f}%".format(item['last_change']*100)}}</td>
-        <td><a href='/.train_result/pred_{{item["code"]}}_{{"{0:0>2d}".format(item["window"])}}_01_{{"{0:0>2d}".format(item["days"])}}.svg' target="_blank">{{"{0:0.6f}".format(item['acc'])}}</a></td>
-        <td>{{item['last_train_date']}}</td>
-        {% for i in range(item['precents']|length) %}
-        <td scope="col" class="percent">{{"{0:0.2f}%".format((item['precents'][i]-1)*100)}}</td>
-        <td scope="col" class="price">{{"{0:0.4f}".format(item['feature_price'][i])}}</td>
-        <td scope="col" class="percent">{{"{0:0.2f}%".format((item['feature_price'][i]/item['last_price']-1)*100)}}</td>
-        <td scope="col" class="price">{{"{0:0.4f}".format(item['feature_price'][i]-item['last_price'])}}</td>
+        <td style="display: none;">{{item['last_train_date']}}</td>
+        {% for i in range(item['days']|length) %}
+        <td><a href='/.train_result/pred_{{item["code"]}}_{{"{0:0>2d}".format(item["window"])}}_{{"{0:0>2d}".format(i+1)}}_{{"{0:0>2d}".format(i+1)}}.svg' target="_blank">{{"{0:0.6f}".format(item['days'][i+1]['acc'])}}</a></td>
+        <td scope="col" class="percent">{{"{0:0.2f}%".format((item['days'][i+1]['precents']-1)*100)}}</td>
+        <td scope="col" class="price">{{"{0:0.2f}".format(item['days'][i+1]['feature_price'])}}</td>
+        <td scope="col" class="percent">{{"{0:0.2f}%".format((item['days'][i+1]['feature_price']/item['last_price']-1)*100)}}</td>
+        <td scope="col" class="price">{{"{0:02f}".format(item['days'][i+1]['feature_price']-item['last_price'])}}</td>
         {% endfor %}
     </tr>
     {% endfor %}

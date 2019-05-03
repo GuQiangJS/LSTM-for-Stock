@@ -1,35 +1,36 @@
-# 创建最新交易日报表
+﻿# 创建最新交易日报表
 
 import os
 import sys
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 nb_dir = os.path.split(os.getcwd())[0]
 if nb_dir not in sys.path:
     sys.path.append(nb_dir)
 if os.getcwd() not in sys.path:
     sys.path.append(os.getcwd())
-import decimal
-from bson import json_util
-from LSTM_for_Stock.data_processor import DataLoaderStock
-from LSTM_for_Stock.data_processor import Wrapper_default
-from LSTM_for_Stock.data_processor import Normalize
-from LSTM_for_Stock.model import SequentialModel
-from app.train_all import get_train_acc
-from app.train_all import get_last_train_date
-from LSTM_for_Stock.loss import root_mean_squared_error
-from QUANTAXIS.QAUtil import QA_util_datetime_to_strdate
-from QUANTAXIS.QAUtil import QA_util_to_datetime
-import QUANTAXIS as QA
-import os
-import numpy as np
-import re
-import datetime
-import logging
-from jinja2 import Environment
-from jinja2 import FileSystemLoader
 
 root_dir = os.path.dirname(os.getcwd())
 model_path = os.path.join(root_dir, '.train_result')
+
+from jinja2 import FileSystemLoader
+from jinja2 import Environment
+import logging
+import datetime
+import re
+import numpy as np
+import QUANTAXIS as QA
+from QUANTAXIS.QAUtil import QA_util_to_datetime
+from QUANTAXIS.QAUtil import QA_util_datetime_to_strdate
+from LSTM_for_Stock.loss import root_mean_squared_error
+from app.train_all import get_last_train_date
+from app.train_all import get_train_acc
+from LSTM_for_Stock.model import SequentialModel
+from LSTM_for_Stock.data_processor import Normalize
+from LSTM_for_Stock.data_processor import Wrapper_default
+from LSTM_for_Stock.data_processor import DataLoaderStock
+from bson import json_util
+import decimal
 
 
 class Predict(object):
@@ -109,9 +110,9 @@ def start_code(code, window, days):
     d['days'] = days
     d['last_date'] = ds.index[-1].date()
     d['last_price'] = ds.iloc[-1]['close']
-    d['last_change'] = ds['close'][-1] / ds['close'][-2] - 1
     d['first_date'] = ds.index[0].date()
     d['first_price'] = ds.iloc[0]['close']
+    d['last_change'] = ds['close'][-1] / ds['close'][-2] - 1
     # d[code] = {'last_date': ds.index[-1].date(),
     #            'last_close': ds.iloc[-1]['close']}
     d['precents'] = y
@@ -125,36 +126,6 @@ def start_code(code, window, days):
     #     d['day{}_pri'.format(i + 1)] = feature_price[i]
     logging.info('{0}_{1}_{2} Done.'.format(code, window, days))
     return d
-
-
-RE_FILENAME = re.compile(r'model_(\d{6})_(\d{2})_(\d{2}).h5')
-lst_w = {}
-for f in os.listdir(model_path):
-    m = RE_FILENAME.match(f)
-    if m:
-        g = m.groups()
-        if g:
-            code = g[0]
-            window = g[1]
-            days = g[2]
-            if window not in lst_w.keys():
-                lst_w[window] = []
-            lst_w[window].append([code, window, days])
-result_full = {}  # 完全结果集
-result_simple = {}  # 比率高于1.1的结果集
-for window, lst in lst_w.items():
-    if window not in result_full.keys():
-        result_full[window] = []
-    if window not in result_simple.keys():
-        result_simple[window] = []
-    for l in lst:
-        logging.info('{0}/{1}'.format(lst.index(l) + 1, len(lst)))
-        rc = start_code(l[0], int(l[1]), int(l[2]))
-        result_full[window].append(rc)
-        for p in rc['precents']:
-            if p > 1.1 and rc['last_change'] * 100 < 9.8:
-                result_simple[window].append(rc)
-                break
 
 
 def default(obj):
@@ -184,24 +155,15 @@ def hook(dct):
 #     file.write(str)
 # logging.info('Daily Result JSON Saved at:' + file)
 
-web_path = os.path.join(root_dir, 'web')
-os.makedirs(web_path, exist_ok=True)
-PATH = os.path.dirname(os.path.abspath(__file__))
-TEMPLATE_ENVIRONMENT = Environment(
-    autoescape=False,
-    loader=FileSystemLoader(os.path.join(PATH, 'templates')),
-    trim_blocks=False)
-template = TEMPLATE_ENVIRONMENT.get_template('daily_report.html')
 
-
-def write_web(path, result):
+def write_web(template, path, result):
     if len(result) > 0:
         with open(path, 'w', encoding='utf-8') as f:
             html = template.render(
                 title=QA_util_datetime_to_strdate(datetime.datetime.today()),
                 result=result)
             f.write(html)
-        logging.info('WebPage Saved at:' + file)
+        logging.info('WebPage Saved at:' + path)
     else:
         logging.info('WebPage Skip.')
 
@@ -210,16 +172,88 @@ def get_datetime_str(dt=datetime.datetime.now(), s='%Y%m%d%H%M%S'):
     return dt.strftime(s)
 
 
-for window, result in result_full.items():
-    if len(result) > 0:
-        path = os.path.join(web_path, window)
-        os.makedirs(path, exist_ok=True)
-        file = os.path.join(path, "{0}_full.html".format(get_datetime_str()))
-        write_web(file, result)
+def _append(d: {}, result: {}, window):
+    if window not in d.keys():
+        d[window] = []
+    found = [i for i in d[window] if i['code'] == result['code']]
+    if not found:
+        found = {}
+        found['name'] = result['name']
+        found['code'] = result['code']
+        found['first_date'] = result['first_date']
+        found['first_price'] = result['first_price']
+        found['last_date'] = result['last_date']
+        found['last_price'] = result['last_price']
+        found['last_change'] = result['last_change']
+        found['last_train_date'] = result['last_train_date']
+        found['days'] = {}
+        found['window'] = result['window']
+        d[window].append(found)
+    else:
+        found = found[0]
+    found['days'][result['days']] = {'precents': result['precents'][0],
+                                     'feature_price': result['feature_price'][
+                                         0],
+                                     'acc': result['acc']}
 
-for window, result in result_simple.items():
-    if len(result) > 0:
-        path = os.path.join(web_path, window)
-        os.makedirs(path, exist_ok=True)
-        file = os.path.join(path, "{0}_simple.html".format(get_datetime_str()))
-        write_web(file, result)
+
+def do_create():
+    RE_FILENAME = re.compile(r'model_(\d{6})_(\d{2})_(\d{2}).h5')
+    lst_w = {}
+    for f in os.listdir(model_path):
+        m = RE_FILENAME.match(f)
+        if m:
+            g = m.groups()
+            if g:
+                code = g[0]
+                window = g[1]
+                days = g[2]
+                if window not in lst_w.keys():
+                    lst_w[window] = []
+                lst_w[window].append([code, window, days])
+    result_full = {}  # 完全结果集
+    result_simple = {}  # 比率高于1.1的结果集
+    for window, lst in lst_w.items():
+        # if int(window) > 2:
+        #    continue
+        # if window not in result_full.keys():
+        #     result_full[window] = []
+        # if window not in result_simple.keys():
+        #     result_simple[window] = []
+        for l in lst:
+            logging.info('{0}/{1}'.format(lst.index(l) + 1, len(lst)))
+            rc = start_code(l[0], int(l[1]), int(l[2]))
+            _append(result_full, rc, window)
+            # result_full[window].append(rc)
+            # for p in rc['precents']:
+            #     if p > 1.1 and rc['last_change'] * 100 < 9.8:
+            #         result_simple[window].append(rc)
+            #         break
+
+    web_path = os.path.join(root_dir, 'web')
+    os.makedirs(web_path, exist_ok=True)
+    PATH = os.path.dirname(os.path.abspath(__file__))
+    TEMPLATE_ENVIRONMENT = Environment(
+        autoescape=False,
+        loader=FileSystemLoader(os.path.join(PATH, 'templates')),
+        trim_blocks=False)
+    template = TEMPLATE_ENVIRONMENT.get_template('daily_report.html')
+
+    for window, result in result_full.items():
+        if len(result) > 0:
+            path = os.path.join(web_path, window)
+            os.makedirs(path, exist_ok=True)
+            file = os.path.join(path,
+                                "{0}_full.html".format(get_datetime_str()))
+            write_web(template, file, result)
+
+    # for window, result in result_simple.items():
+    #     if len(result) > 0:
+    #         path = os.path.join(web_path, window)
+    #         os.makedirs(path, exist_ok=True)
+    #         file = os.path.join(path, "{0}_simple.html".format(get_datetime_str()))
+    #         write_web(template,file, result)
+
+
+if __name__ == "__main__":
+    do_create()
