@@ -1,5 +1,23 @@
 ﻿# 创建最新交易日报表
 
+import decimal
+from bson import json_util
+from LSTM_for_Stock.data_processor import DataLoaderStock
+from LSTM_for_Stock.data_processor import Wrapper_default
+from LSTM_for_Stock.data_processor import Normalize
+from LSTM_for_Stock.model import SequentialModel
+from app.train_all import get_train_acc
+from app.train_all import get_last_train_date
+from LSTM_for_Stock.loss import root_mean_squared_error
+from QUANTAXIS.QAUtil import QA_util_datetime_to_strdate
+from QUANTAXIS.QAUtil import QA_util_to_datetime
+import QUANTAXIS as QA
+import numpy as np
+import re
+import datetime
+import logging
+from jinja2 import Environment
+from jinja2 import FileSystemLoader
 import os
 import sys
 
@@ -10,31 +28,9 @@ if nb_dir not in sys.path:
 if os.getcwd() not in sys.path:
     sys.path.append(os.getcwd())
 
-root_dir = os.path.dirname(os.getcwd())
-model_path = os.path.join(root_dir, '.train_result')
-
-from jinja2 import FileSystemLoader
-from jinja2 import Environment
-import logging
-import datetime
-import re
-import numpy as np
-import QUANTAXIS as QA
-from QUANTAXIS.QAUtil import QA_util_to_datetime
-from QUANTAXIS.QAUtil import QA_util_datetime_to_strdate
-from LSTM_for_Stock.loss import root_mean_squared_error
-from app.train_all import get_last_train_date
-from app.train_all import get_train_acc
-from LSTM_for_Stock.model import SequentialModel
-from LSTM_for_Stock.data_processor import Normalize
-from LSTM_for_Stock.data_processor import Wrapper_default
-from LSTM_for_Stock.data_processor import DataLoaderStock
-from bson import json_util
-import decimal
-
 
 class Predict(object):
-    def __init__(self, code, window, days):
+    def __init__(self, path, code, window, days):
         self.code = code
         self.window = window
         self.days = days
@@ -42,7 +38,7 @@ class Predict(object):
         model_filename = 'model_{2}_{0:02d}_{1:02d}.h5'.format(window, days,
                                                                code)
         m = SequentialModel()
-        m.load(os.path.join(model_path, model_filename),
+        m.load(os.path.join(path, model_filename),
                custom_objects={
                    'root_mean_squared_error': root_mean_squared_error})
         self.model = m
@@ -99,9 +95,9 @@ class Predict(object):
     #     return result
 
 
-def start_code(code, window, days):
+def start_code(path, code, window, days):
     d = {}
-    p = Predict(code, window, days)
+    p = Predict(path, code, window, days)
     ds, y, feature_price = p.do_prediction()
     del p
     d['code'] = code
@@ -197,7 +193,13 @@ def _append(d: {}, result: {}, window):
                                      'acc': result['acc']}
 
 
-def do_create():
+def do_create(root_dir=os.path.dirname(os.getcwd())):
+
+    model_path = os.path.join(root_dir, '.train_result')
+    print(model_path)
+    if not os.path.exists(model_path):
+        raise FileNotFoundError()
+
     RE_FILENAME = re.compile(r'model_(\d{6})_(\d{2})_(\d{2}).h5')
     lst_w = {}
     for f in os.listdir(model_path):
@@ -222,7 +224,7 @@ def do_create():
         #     result_simple[window] = []
         for l in lst:
             logging.info('{0}/{1}'.format(lst.index(l) + 1, len(lst)))
-            rc = start_code(l[0], int(l[1]), int(l[2]))
+            rc = start_code(model_path, l[0], int(l[1]), int(l[2]))
             _append(result_full, rc, window)
             # result_full[window].append(rc)
             # for p in rc['precents']:

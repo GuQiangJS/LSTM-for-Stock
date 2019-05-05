@@ -12,4 +12,4 @@ while(True):
 from app import create_daily_report as c
 
 if __name__ == "__main__":
-    c.do_create()
+    c.do_create(os.path.dirname(os.path.dirname(os.getcwd())))
