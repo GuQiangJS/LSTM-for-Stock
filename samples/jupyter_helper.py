@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import wmi
+# import wmi
 from keras.backend import clear_session
 from scipy import stats
 
@@ -28,22 +28,22 @@ matplotlib.rcParams['font.sans-serif'] = ['Noto Sans CJK SC', 'SimHei']
 matplotlib.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号\n
 
 
-def print_system_info():
-    computer = wmi.WMI()
-    computer_info = computer.Win32_ComputerSystem()[0]
-    os_info = computer.Win32_OperatingSystem()[0]
-    proc_info = computer.Win32_Processor()[0]
-    gpu_info = computer.Win32_VideoController()[0]
+# def print_system_info():
+#     computer = wmi.WMI()
+#     computer_info = computer.Win32_ComputerSystem()[0]
+#     os_info = computer.Win32_OperatingSystem()[0]
+#     proc_info = computer.Win32_Processor()[0]
+#     gpu_info = computer.Win32_VideoController()[0]
 
-    os_name = os_info.Name.encode('utf-8').split(b'|')[0]
-    os_version = ' '.join([os_info.Version, os_info.BuildNumber])
-    system_ram = float(os_info.TotalVisibleMemorySize) / 1048576  # KB to GB
+#     os_name = os_info.Name.encode('utf-8').split(b'|')[0]
+#     os_version = ' '.join([os_info.Version, os_info.BuildNumber])
+#     system_ram = float(os_info.TotalVisibleMemorySize) / 1048576  # KB to GB
 
-    print('OS Name: {0}'.format(os_name))
-    print('OS Version: {0}'.format(os_version))
-    print('CPU: {0}'.format(proc_info.Name))
-    print('RAM: {0} GB'.format(system_ram))
-    print('Graphics Card: {0}'.format(gpu_info.Name))
+#     print('OS Name: {0}'.format(os_name))
+#     print('OS Version: {0}'.format(os_version))
+#     print('CPU: {0}'.format(proc_info.Name))
+#     print('RAM: {0} GB'.format(system_ram))
+#     print('Graphics Card: {0}'.format(gpu_info.Name))
 
 
 def do(code='000002',
@@ -63,11 +63,10 @@ def do(code='000002',
         code, wrapper=wrapper, appends=kwargs.pop('appends', []))
     df = dl.load()
     # print(df.head(window+2))
-    train, test = DataHelper.train_test_split(df, batch_size=window + days)
+    train, test = DataHelper.train_test_split(df, batch_size=window + days,train_size=kwargs.pop('train_size',0.85))
     # print(train[0])
     X_train, Y_train = DataHelper.xy_split_2(train, window, days, norm=norm)
     X_test, Y_test = DataHelper.xy_split_2(test, window, days, norm=norm)
-    # print(X_train[0])
     # print(X_train[0])
     # print(Y_train[0])
     # print(X_test[0])
